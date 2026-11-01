@@ -17,11 +17,13 @@
         <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="" width="32" height="32">
         <span>SoilWatch <b>ID</b></span>
       </a>
+      {% block nav %}
       <nav class="links" aria-label="Menu utama">
         <a href="{{ url_for('beranda') }}" class="{{ 'on' if menu == 'beranda' }}">Beranda</a>
         <a href="{{ url_for('prediksi') }}" class="{{ 'on' if menu == 'prediksi' }}">Prediksi</a>
         <a href="{{ url_for('informasi') }}" class="{{ 'on' if menu == 'informasi' }}">Informasi</a>
       </nav>
+      {% endblock %}
     </div>
   </header>
   <main class="page">

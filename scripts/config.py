@@ -18,21 +18,21 @@ FITUR = [
 # Pembagian temporal (Subbab 2.2.1.11): 33 bulan latih, 9 bulan uji
 AKHIR_LATIH = "2025-09-01"   # Jan 2023 - Sep 2025
 AWAL_UJI = "2025-10-01"      # Okt 2025 - Jun 2026
+AKHIR_DATA = "2026-06-01"    # batas akhir periode penelitian (bulan setelahnya diabaikan oleh script 01)
 
-# Tujuh kelompok wilayah (Subbab 2.2.3.4), dipetakan dari nama provinsi di data (FAO GAUL)
+# Tujuh kelompok wilayah (Subbab 2.2.3.4), dipetakan dari nama provinsi di data
+# (FAO GAUL 2025: 38 provinsi, 514 kabupaten/kota, termasuk 4 provinsi baru di Papua)
 KELOMPOK = {
-    "Sumatera": ["Nangroe Aceh Darussalam", "Sumatera Utara", "Sumatera Barat", "Riau",
-                 "Kepulauan-riau", "Jambi", "Sumatera Selatan", "Bangka Belitung",
-                 "Bengkulu", "Lampung"],
-    "Jawa": ["Dki Jakarta", "Banten", "Jawa Barat", "Jawa Tengah",
-             "Daerah Istimewa Yogyakarta", "Jawa Timur"],
-    "Bali-Nusa Tenggara": ["Bali", "Nusatenggara Barat", "Nusatenggara Timur"],
-    "Kalimantan": ["Kalimantan Barat", "Kalimantan Tengah", "Kalimantan Selatan",
-                   "Kalimantan Timur"],
-    "Sulawesi": ["Sulawesi Utara", "Gorontalo", "Sulawesi Tengah", "Sulawesi Barat",
-                 "Sulawesi Selatan", "Sulawesi Tenggara"],
+    "Sumatera": ["Aceh", "Sumatera Utara", "Sumatera Barat", "Riau", "Kepulauan Riau", "Jambi",
+                 "Sumatera Selatan", "Kepulauan Bangka Belitung", "Bengkulu", "Lampung"],
+    "Jawa": ["Dki Jakarta", "Banten", "Jawa Barat", "Jawa Tengah", "Daerah Istimewa Yogyakarta", "Jawa Timur"],
+    "Bali-Nusa Tenggara": ["Bali", "Nusa Tenggara Barat", "Nusa Tenggara Timur"],
+    "Kalimantan": ["Kalimantan Barat", "Kalimantan Tengah", "Kalimantan Selatan", "Kalimantan Timur",
+                   "Kalimantan Utara"],
+    "Sulawesi": ["Sulawesi Utara", "Gorontalo", "Sulawesi Tengah", "Sulawesi Barat", "Sulawesi Selatan",
+                 "Sulawesi Tenggara"],
     "Maluku": ["Maluku", "Maluku Utara"],
-    "Papua": ["Papua", "Papua Barat"],
+    "Papua": ["Papua", "Papua Barat", "Papua Barat Daya", "Papua Tengah", "Papua Pegunungan", "Papua Selatan"],
 }
 PROV_KE_KELOMPOK = {p: k for k, ps in KELOMPOK.items() for p in ps}
 

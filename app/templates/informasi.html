@@ -29,7 +29,7 @@
     <div class="info-stack">
       <section class="card info-card" id="tentang">
       <h2>Tentang aplikasi</h2>
-      <p>SoilWatch ID adalah aplikasi pemantauan kelembapan tanah (<i>soil moisture</i>) bulanan untuk 442 kabupaten/kota
+      <p>SoilWatch ID adalah aplikasi pemantauan kelembapan tanah (<i>soil moisture</i>) bulanan untuk {{ jumlah_wilayah }} kabupaten/kota
         di Indonesia. Aplikasi ini ditujukan bagi staf dinas pertanian kabupaten/kota dan penyuluh pertanian sebagai
         bahan pertimbangan awal dalam memantau potensi kekeringan, dengan menyajikan estimasi berbasis data penginderaan
         jauh beserta penjelasan faktor yang memengaruhinya.</p>
@@ -95,8 +95,8 @@
         <div class="note ok akurasi-ringkas">Secara rata-rata, estimasi berselisih sekitar <b>±{{ m.MAE | angka(3) }} m³/m³</b>
           dari nilai acuan SMAP L4.{% for n, d in (konf.get('metrik_uji_wilayah_khusus') or {}).items() if n.startswith('Wilayah gambut') %}
           Di wilayah gambut, selisihnya lebih besar, sekitar <b>±{{ d.MAE | angka(3) }} m³/m³</b>, sehingga hasil di wilayah tersebut perlu ditafsirkan dengan hati-hati.{% endfor %}</div>
-        <p>Model yang digunakan: <b>{{ konf.get('pendekatan', '-') }}</b>{% set reg = (konf.get('per_kelompok') or {}).items() | selectattr(1, 'equalto', 'regional') | map(attribute=0) | list %}{% if reg %}, dengan model regional untuk {{ reg | join(' dan ') }} dan model nasional untuk wilayah lainnya{% endif %}.
-          Pengujian dilakukan pada data Oktober 2025 – Juni 2026 yang tidak digunakan dalam pelatihan model.</p>
+        <p>Model yang digunakan: <b>{{ {'xgb': 'XGBoost', 'rf': 'Random Forest', 'RF': 'Random Forest', 'Gabungan': 'gabungan Random Forest dan XGBoost', 'gabungan': 'gabungan Random Forest dan XGBoost'}.get(konf.get('pendekatan'), konf.get('pendekatan', '-')) }}</b>{% set reg = (konf.get('per_kelompok') or {}).items() | selectattr(1, 'equalto', 'regional') | map(attribute=0) | list %}{% if reg %}, dengan model regional untuk {{ reg | join(' dan ') }} dan model nasional untuk wilayah lainnya{% endif %}.
+          {% if konf.get('dilatih_ulang') %}Model dilatih ulang dengan data sampai {{ konf.get('data_latih_sampai') | bulan_teks }}. Akurasi di bawah diukur pada data {{ konf.get('periode_uji') }} sebelum bulan-bulan tersebut ikut dipakai dalam pelatihan.{% else %}Pengujian dilakukan pada data Oktober 2025 – Juni 2026 yang tidak digunakan dalam pelatihan model.{% endif %}</p>
         <table class="src">
           <tr><th>Cakupan</th><th>R²</th><th>MAE (m³/m³)</th></tr>
           <tr><td>Seluruh Indonesia</td><td>{{ m.R2 | angka(2) }}</td><td>{{ m.MAE | angka(3) }}</td></tr>
@@ -120,12 +120,11 @@
       <section class="card info-card" id="data">
       <h2>Data dan metode</h2>
       <div class="chips">
-        {% for s in ['SMAP Level 4', 'CHIRPS', 'ERA5-Land', 'MODIS', 'SRTM', 'OpenLandMap', 'ESA WorldCover', 'Peta Lahan Gambut Kementan', 'FAO GAUL 2015'] %}
+        {% for s in ['SMAP Level 4', 'CHIRPS', 'ERA5-Land', 'MODIS', 'SRTM', 'OpenLandMap', 'ESA WorldCover', 'Peta Lahan Gambut Kementan', 'FAO GAUL 2025'] %}
         <span class="chip chip-grey">{{ s }}</span>{% endfor %}
       </div>
       <p>Estimasi dihasilkan oleh model terbaik dari perbandingan <i>Random Forest</i>, XGBoost, dan model gabungan
-        keduanya, lalu dijelaskan menggunakan SHAP. Data mencakup 442 kabupaten/kota pada periode Januari 2023 –
-        Juni 2026. Data hasil ekstraksi Google Earth Engine disimpan dalam basis data aplikasi, sehingga
+        keduanya, lalu dijelaskan menggunakan SHAP. Data mencakup {{ jumlah_wilayah }} kabupaten/kota pada periode {{ rentang_data }}. Data hasil ekstraksi Google Earth Engine disimpan dalam basis data aplikasi, sehingga
         aplikasi tidak perlu terhubung langsung ke Google Earth Engine saat digunakan.</p>
       <table class="src">
         <tr><th>Variabel</th><th>Sumber</th></tr>
@@ -137,7 +136,7 @@
         <tr><td>Kandungan liat</td><td>OpenLandMap</td></tr>
         <tr><td>Proporsi badan air dan lahan pertanian</td><td>ESA WorldCover 2021</td></tr>
         <tr><td>Proporsi lahan gambut</td><td>Peta Lahan Gambut Indonesia 1:50.000 (Kementan, 2019), melalui Trase</td></tr>
-        <tr><td>Batas kabupaten/kota (442 wilayah)</td><td>FAO GAUL 2015</td></tr>
+        <tr><td>Batas kabupaten/kota ({{ jumlah_wilayah }} wilayah, 38 provinsi)</td><td>FAO GAUL 2025</td></tr>
       </table>
       <p class="muted small-2">Badan air dihitung dari kelas "Permanent water bodies" ESA WorldCover; laut dikeluarkan
         dengan elevasi SRTM dan jarak dari garis pantai. Lahan pertanian dihitung dari kelas "Cropland" (tanaman semusim).
@@ -164,8 +163,10 @@
             tercakup dalam variabel model.</li>
           <li>Satu piksel SMAP L4 berukuran sekitar 9 km, sehingga nilai kota yang kecil dapat ikut dipengaruhi sungai,
             rawa, atau laut di sekitarnya.</li>
-          <li>Batas wilayah mengikuti FAO GAUL 2015 (442 kabupaten/kota); kabupaten/kota hasil pemekaran setelahnya
-            tergabung dengan wilayah induknya.</li>
+          <li>Tiga wilayah yang lebih kecil dari satu piksel data dan berada di pesisir (Kota Sibolga, Kota Pekalongan,
+            dan Kepulauan Seribu) memakai nilai rata-rata area di sekitarnya (radius 10–30 km).</li>
+          <li>Data SMAP L4 dapat diproses ulang oleh NASA. Data dalam aplikasi ini diekstrak dari Google Earth Engine
+            pada 1 November 2026; nilai bulan yang sama dapat sedikit berbeda jika diekstrak pada waktu lain.</li>
           <li>Kelas lahan pertanian ESA WorldCover hanya mencakup tanaman semusim, sehingga perkebunan tidak termasuk.</li>
         </ul>
       </section>

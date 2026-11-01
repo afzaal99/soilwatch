@@ -1,50 +1,50 @@
-2023: 5,304 baris, 442 kabupaten/kota
-2024: 5,304 baris, 442 kabupaten/kota
-2025: 5,304 baris, 442 kabupaten/kota
-2026: 2,652 baris, 442 kabupaten/kota
+SoilMoisture_2023_01_sd_2023_12.csv: 6,168 baris, 514 kabupaten/kota, 12 bulan
+SoilMoisture_2024_01_sd_2024_12.csv: 6,168 baris, 514 kabupaten/kota, 12 bulan
+SoilMoisture_2025_01_sd_2025_12.csv: 6,168 baris, 514 kabupaten/kota, 12 bulan
+SoilMoisture_2026_01_sd_2026_06.csv: 3,084 baris, 514 kabupaten/kota, 6 bulan
 
-Total: 18,564 baris = 442 kabupaten/kota x 42 bulan (Jan 2023 - Jun 2026), 33 provinsi
+Total: 21,588 baris = 514 kabupaten/kota x 42 bulan (Jan 2023 - Jun 2026), 38 provinsi
 Duplikat (wilayah, bulan): 0
 Panel lengkap (setiap wilayah punya 42 bulan): ya
-Variabel statis elevation: selisih maks antarbulan dalam satu wilayah = 1.02e-12
-Variabel statis slope: selisih maks antarbulan dalam satu wilayah = 1.02e-14
-Variabel statis clay_content: selisih maks antarbulan dalam satu wilayah = 1.07e-13
-Kelembapan relatif vs Persamaan (2.5)-(2.6): selisih maks = 6.1e-13
+Variabel statis elevation: selisih maks antarbulan dalam satu wilayah = 1.14e-13
+Variabel statis slope: selisih maks antarbulan dalam satu wilayah = 2.22e-16
+Variabel statis clay_content: selisih maks antarbulan dalam satu wilayah = 2.13e-14
+Kelembapan relatif vs Persamaan (2.5)-(2.6): selisih maks = 1.3e-13
 
 Nilai hilang awal:
-  lst_celsius: 56 baris di 32 wilayah
+  lst_celsius: 62 baris di 34 wilayah
 
-Artefak radiasi matahari (< 50% median wilayahnya): 84 baris di 14 wilayah pesisir/pulau kecil -> dijadikan nilai hilang
-  wilayah: Kepulauan-talaud, Klungkung, Kota Batam, Kota Jakarta Utara, Kota Kupang, Kota Pariaman, Kota Sabang, Kota Sibolga, Kota Tarakan, Kota Tegal, Kota Ternate, Lingga, Maluku Tenggara, Wakatobi
+Artefak radiasi matahari (< 50% median wilayahnya): 131 baris di 18 wilayah pesisir/pulau kecil -> dijadikan nilai hilang
+  wilayah: Banggai Laut, Kepulauan Anambas, Kepulauan Seribu, Kepulauan Talaud, Klungkung, Kota Batam, Kota Jakarta Utara, Kota Pariaman, Kota Pekalongan, Kota Sabang, Kota Sibolga, Kota Tarakan, Kota Tegal, Kota Ternate, Kota Tual, Lingga, Siau Tagulandang Biaro, Wakatobi
 
 Wilayah dengan > 30% nilai hilang (dikeluarkan): 0
-Nilai hilang diisi interpolasi temporal per wilayah: 140 sel; sisa: 0
+Nilai hilang diisi interpolasi temporal per wilayah: 193 sel; sisa: 0
 
 Kandidat outlier IQR (kuartil dari data latih) dan validasi batas fisik:
-  curah_hujan_bulanan    kandidat   169  melanggar batas fisik 0
-  suhu_celsius           kandidat   624  melanggar batas fisik 0
-  dew_point_celsius      kandidat   354  melanggar batas fisik 0
-  ndvi                   kandidat   471  melanggar batas fisik 0
-  lst_celsius            kandidat   969  melanggar batas fisik 0
-  elevation              kandidat  1008  melanggar batas fisik 0
-  slope                  kandidat    42  melanggar batas fisik 0
-  solar_radiation        kandidat   422  melanggar batas fisik 0
-  wind_speed             kandidat   862  melanggar batas fisik 0
-  clay_content           kandidat   546  melanggar batas fisik 0
-  soil_temperature       kandidat   793  melanggar batas fisik 0
-  relative_humidity      kandidat  1086  melanggar batas fisik 0
-  soil_moisture          kandidat   849  melanggar batas fisik 0
+  curah_hujan_bulanan    kandidat   218  melanggar batas fisik 0
+  suhu_celsius           kandidat   871  melanggar batas fisik 0
+  dew_point_celsius      kandidat   520  melanggar batas fisik 0
+  ndvi                   kandidat   558  melanggar batas fisik 0
+  lst_celsius            kandidat  1393  melanggar batas fisik 0
+  elevation              kandidat  1344  melanggar batas fisik 0
+  slope                  kandidat     0  melanggar batas fisik 0
+  solar_radiation        kandidat   482  melanggar batas fisik 0
+  wind_speed             kandidat  1075  melanggar batas fisik 0
+  clay_content           kandidat   630  melanggar batas fisik 0
+  soil_temperature       kandidat   977  melanggar batas fisik 0
+  relative_humidity      kandidat  1258  melanggar batas fisik 0
+  soil_moisture          kandidat  1064  melanggar batas fisik 0
   -> Kandidat yang tidak melanggar batas fisik dianggap kondisi nyata (mis. curah hujan puncak
      musim hujan, lahan gambut yang sangat basah) dan dipertahankan, sesuai Subbab 2.2.1.11.
 
 Jumlah kabupaten/kota per kelompok wilayah:
 kelompok_wilayah
-Bali-Nusa Tenggara     34
-Jawa                  116
-Kalimantan             52
-Maluku                 16
-Papua                  29
-Sulawesi               63
-Sumatera              132
+Bali-Nusa Tenggara     41
+Jawa                  119
+Kalimantan             56
+Maluku                 21
+Papua                  42
+Sulawesi               81
+Sumatera              154
 
-Data latih: 14,586 baris (33 bulan); data uji: 3,978 baris (9 bulan)
+Data latih: 16,962 baris (33 bulan); data uji: 4,626 baris (9 bulan)

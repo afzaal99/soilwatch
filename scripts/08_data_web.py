@@ -7,9 +7,9 @@ tanpa koneksi langsung ke Google Earth Engine.
 
 Keluaran:
   app/data/soilwatch.db           basis data SQLite:
-      wilayah        442 kabupaten/kota + penanda lahan (gambut, badan air, pertanian)
+      wilayah        514 kabupaten/kota (FAO GAUL 2025) + penanda lahan (gambut, badan air, pertanian)
       periode        42 bulan
-      data_bulanan   soil moisture SMAP + 12 variabel per wilayah per bulan (18.564 baris)
+      data_bulanan   soil moisture SMAP + 12 variabel per wilayah per bulan (514 x 42 = 21.588 baris)
       meta           statistik data latih, kepentingan variabel (SHAP), pilihan model, dll.
   app/static/img/peta_wilayah.svg peta interaktif, setiap poligon diberi data-id wilayah, ditambah
                                   bentuk asli danau/waduk besar dan sebaran gambut (jika file hasil
@@ -161,7 +161,8 @@ def tulis_peta(poli, lapis):
         (kosong if wid is None else per_wilayah.setdefault(wid, [])).extend(cincin)
     paths, cocok = [], set()
     for wid, cincin in per_wilayah.items():
-        d = path_d(cincin, proj, 0.5)
+        # wilayah sangat kecil (mis. Kota Sibolga ~11 km2) bisa hilang saat titik dirampingkan -> tanpa perampingan
+        d = path_d(cincin, proj, 0.5) or path_d(cincin, proj, 0)
         if d:
             cocok.add(wid)
             paths.append(f'<path data-id="{wid}" d="{d}"/>')

@@ -21,29 +21,29 @@
  },
  "keterangan": "prediksi = bobot_rf x RF + (1 - bobot_rf) x XGBoost; per_kelompok memilih model nasional atau regional (aturan 10% RMSE). Mode Simulasi memakai model nasional.",
  "metrik_uji_indonesia": {
-  "R2": 0.8387,
-  "MAE": 0.0255,
-  "RMSE": 0.0354
+  "R2": 0.8,
+  "MAE": 0.0307,
+  "RMSE": 0.0406
  },
  "metrik_uji_wilayah_khusus": {
   "Wilayah danau": {
-   "R2": 0.7935,
-   "MAE": 0.0191,
-   "RMSE": 0.025,
-   "n": 351.0
+   "R2": 0.5862,
+   "MAE": 0.0296,
+   "RMSE": 0.0365,
+   "n": 369.0
   },
   "Wilayah gambut (>=20%)": {
-   "R2": 0.2012,
-   "MAE": 0.0593,
-   "RMSE": 0.0771,
-   "n": 180.0
+   "R2": 0.5712,
+   "MAE": 0.0517,
+   "RMSE": 0.067,
+   "n": 243.0
   },
   "Wilayah lainnya": {
-   "R2": 0.8545,
-   "MAE": 0.0244,
-   "RMSE": 0.0327,
-   "n": 3456.0
+   "R2": 0.7784,
+   "MAE": 0.0295,
+   "RMSE": 0.0388,
+   "n": 4014.0
   }
  },
- "dibuat": "2026-10-31T17:32:15"
+ "dibuat": "2026-11-01T20:19:57"
 }

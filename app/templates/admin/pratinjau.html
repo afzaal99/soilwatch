@@ -1,0 +1,135 @@
+{% extends "admin/_dasar.html" %}
+{% block judul %}Pemeriksaan Data{% endblock %}
+{% block isi %}
+{% set lap = r.laporan %}
+<div class="page-head">
+  <div>
+    <div class="title-row">
+      <h1 class="p-title">Pemeriksaan Data</h1>
+      {% if r.berkas %}<span class="chip chip-grey">{{ r.berkas }}</span>{% endif %}
+    </div>
+    <p class="muted">{{ 'Periksa ringkasan di bawah sebelum menyimpan data ke aplikasi.' if token else 'Berkas belum bisa disimpan karena ada masalah berikut.' }}</p>
+  </div>
+  <ol class="steps" aria-label="Langkah">
+    <li class="step done"><span class="step-dot"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span><span>Unggah berkas</span></li>
+    <li class="step-line" aria-hidden="true"></li>
+    <li class="step on" aria-current="step"><span class="step-dot">2</span><span>Periksa</span></li>
+    <li class="step-line" aria-hidden="true"></li>
+    <li class="step"><span class="step-dot">3</span><span>Simpan</span></li>
+  </ol>
+</div>
+
+{% if lap.galat %}
+<section class="card adm-card adm-galat">
+  <div class="card-h"><h2>Data belum bisa disimpan</h2><span class="chip bad">{{ lap.galat | length }} masalah</span></div>
+  <ul class="adm-daftar bad">{% for g in lap.galat %}<li>{{ g }}</li>{% endfor %}</ul>
+  <p class="note">Perbaiki berkas (biasanya cukup dengan mengekspor ulang dari script 09), lalu unggah kembali.
+    Tidak ada data yang diubah.</p>
+  <div class="adm-aksi"><a class="btn p sm" href="{{ url_for('admin.unggah') }}">Unggah Berkas Lain</a></div>
+</section>
+{% endif %}
+
+{% if r.bulan %}
+<section class="card adm-card">
+  <h2 class="adm-h">Ringkasan berkas</h2>
+  <div class="adm-tabel-wrap"><table class="src adm-tabel">
+    <tr><th>Bulan</th><th>Kabupaten/kota</th><th>Nilai kosong</th><th>Status</th><th>Aman diunggah mulai</th></tr>
+    {% for b in r.bulan %}
+    <tr>
+      <td><b>{{ b.label }}</b></td>
+      <td>{{ b.wilayah }} / {{ jumlah_wilayah }}</td>
+      <td>{{ b.hilang if b.hilang else '–' }}</td>
+      <td>{% if b.sudah_ada %}<span class="chip chip-grey sm">Sudah ada</span>{% else %}<span class="chip sm">Bulan baru</span>{% endif %}</td>
+      <td>{{ b.aman_mulai }}{% if b.belum_aman %} <span class="chip chip-kering sm">Belum lewat</span>{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </table></div>
+  {% for p in lap.peringatan %}<div class="alert warn small adm-alert">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4M12 17h.01"/></svg><span>{{ p }}</span></div>{% endfor %}
+  {% if lap.info %}<ul class="adm-daftar">{% for i in lap.info %}<li>{{ i }}</li>{% endfor %}</ul>{% endif %}
+</section>
+{% endif %}
+
+{% if token %}
+{% set ev = r.eval %}
+<div class="adm-grid">
+  <section class="card adm-card">
+    <div class="card-h wrap">
+      <h2>Akurasi model pada data baru</h2>
+      {% if ev.mae_uji %}{% if ev.perhatian %}<span class="chip bad">Perlu perhatian</span>{% else %}<span class="chip ok">Normal</span>{% endif %}{% endif %}
+    </div>
+    <div class="adm-angka">
+      <div><span class="muted small">MAE</span><b>{{ ev.total.mae | angka(4) }}</b><small class="muted">uji: {{ ev.mae_uji | angka(4) if ev.mae_uji else '–' }}</small></div>
+      <div><span class="muted small">R²</span><b>{{ ev.total.r2 | angka(3) }}</b><small class="muted">uji: {{ ev.r2_uji | angka(3) if ev.r2_uji else '–' }}</small></div>
+      <div><span class="muted small">Dibanding uji</span><b>{{ (ev.rasio | angka(2)) ~ '×' if ev.rasio else '–' }}</b><small class="muted">batas {{ ev.ambang | angka(1) }}×</small></div>
+    </div>
+    <p class="note {{ 'warn' if ev.perhatian else 'ok' }}">
+      {% if ev.mae_uji %}
+      Rata-rata selisih estimasi model dengan nilai acuan SMAP L4 adalah <b>{{ ev.total.mae | angka(4) }} m³/m³</b>,
+      {% if ev.perhatian %}lebih dari {{ ev.ambang | angka(1) }} kali hasil pengujian ({{ ev.mae_uji | angka(4) }} m³/m³).
+      Data tetap boleh disimpan karena peta memakai nilai SMAP asli, tetapi model sebaiknya dilatih ulang.
+      {% else %}masih sebanding dengan hasil pengujian ({{ ev.mae_uji | angka(4) }} m³/m³). Model masih layak dipakai.{% endif %}
+      {% else %}Hasil pengujian model belum tersedia sebagai pembanding.{% endif %}
+    </p>
+    {% if ev.per_bulan | length > 1 %}
+    <table class="src adm-tabel">
+      <tr><th>Bulan</th><th>MAE</th><th>R²</th><th>Status</th></tr>
+      {% for e in ev.per_bulan %}<tr><td>{{ e.label }}</td><td>{{ e.mae | angka(4) }}</td><td>{{ e.r2 | angka(3) }}</td>
+        <td>{% if e.status == 'perhatian' %}<span class="chip bad sm">Perlu perhatian</span>{% elif e.status == 'normal' %}<span class="chip ok sm">Normal</span>{% else %}–{% endif %}</td></tr>{% endfor %}
+    </table>
+    {% endif %}
+    <p class="muted small adm-p">Model: {{ ev.model }}{% if ev.contoh %} (model sementara: berkas model belum ditemukan){% endif %}.</p>
+  </section>
+
+  <section class="card adm-card">
+    {% if r.selisih %}
+    <h2 class="adm-h">Perbandingan dengan data tersimpan</h2>
+    <p class="muted small-2 adm-p">Bulan yang sudah ada dibandingkan dengan data lama. Selisih mendekati nol berarti
+      script ekstraksi menghasilkan data yang konsisten dengan data latih.</p>
+    <div class="adm-tabel-wrap"><table class="src adm-tabel">
+      <tr><th>Variabel</th><th>Selisih maks</th><th>Rata-rata</th><th></th></tr>
+      {% for s in r.selisih %}<tr><td>{{ s.var }}</td><td>{{ s.maks }}</td><td>{{ s.rata }}</td>
+        <td>{% if s.sama %}<span class="chip ok sm">Sama</span>{% else %}<span class="chip chip-kering sm">Berbeda</span>{% endif %}</td></tr>{% endfor %}
+    </table></div>
+    {% endif %}
+
+    <h2 class="adm-h {{ 'adm-h-jarak' if r.selisih }}">Simpan ke aplikasi</h2>
+    <form method="post" action="{{ url_for('admin.simpan', token=token) }}" id="f-simpan">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+      {% set ada_lama = r.bulan | selectattr('sudah_ada') | list %}
+      {% set belum_aman = r.bulan | selectattr('belum_aman') | list %}
+      {% if ada_lama %}
+      <label class="adm-cek-box">
+        <input type="checkbox" name="timpa" value="1" {{ 'required' if ada_lama | length == r.bulan | length }}>
+        <span>Timpa data lama untuk {{ ada_lama | map(attribute='label') | join(', ') }}.
+          <small class="muted">Jika tidak dicentang, bulan tersebut dilewati.</small></span>
+      </label>
+      {% endif %}
+      {% if belum_aman %}
+      <label class="adm-cek-box warn">
+        <input type="checkbox" required>
+        <span>Data {{ belum_aman | map(attribute='label') | join(', ') }} diunggah sebelum tanggal aman. Saya sudah
+          memeriksa hasil cek kelengkapan di Google Earth Engine dan semua sumber bertanda ✅.</span>
+      </label>
+      {% endif %}
+      <ul class="adm-daftar">
+        <li>Basis data dicadangkan otomatis sebelum disimpan, sehingga bisa dipulihkan dari menu Cadangan.</li>
+        <li>Peta Beranda, peta Mode Otomatis, ringkasan, grafik, dan unduhan CSV langsung memakai data terbaru.</li>
+      </ul>
+      <div class="adm-aksi">
+        <button class="btn p sm" type="submit" id="b-simpan">Simpan &amp; Perbarui Aplikasi</button>
+        <button class="btn s sm adm-batal" type="submit" form="f-batal">Batal</button>
+      </div>
+    </form>
+    <form method="post" action="{{ url_for('admin.batal', token=token) }}" id="f-batal">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+    </form>
+  </section>
+</div>
+<script>
+document.getElementById('f-simpan').addEventListener('submit', function () {
+  const b = document.getElementById('b-simpan'); b.disabled = true; b.textContent = 'Menyimpan dan memperbarui peta…';
+});
+</script>
+{% endif %}
+{% endblock %}

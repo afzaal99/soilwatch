@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{# Kerangka halaman admin: menu admin + pesan notifikasi #}
+{% block title %}{% block judul %}Admin{% endblock %} · Admin SoilWatch ID{% endblock %}
+{% block nav %}
+<nav class="links adm-links" aria-label="Menu admin">
+  {% if session.admin %}
+  <a href="{{ url_for('admin.dashboard') }}" class="{{ 'on' if bagian == 'dashboard' }}">Dashboard</a>
+  <a href="{{ url_for('admin.unggah') }}" class="{{ 'on' if bagian == 'unggah' }}">Unggah Data</a>
+  <a href="{{ url_for('admin.model') }}" class="{{ 'on' if bagian == 'model' }}">Model</a>
+  <a href="{{ url_for('admin.cadangan') }}" class="{{ 'on' if bagian == 'cadangan' }}">Cadangan</a>
+  <a href="{{ url_for('beranda') }}" target="_blank" rel="noopener">Lihat Situs
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>
+  <form method="post" action="{{ url_for('admin.keluar') }}" class="adm-keluar">
+    <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+    <button type="submit">Keluar</button>
+  </form>
+  {% else %}
+  <a href="{{ url_for('beranda') }}">Kembali ke Situs</a>
+  {% endif %}
+</nav>
+{% endblock %}
+{% block content %}
+{% with pesan = get_flashed_messages(with_categories=true) %}
+{% if pesan %}
+<div class="adm-flash">
+  {% for jenis, teks in pesan %}
+  <div class="alert {{ 'ok' if jenis == 'ok' else 'bad' }}" role="status">
+    {% if jenis == 'ok' %}<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>
+    {% else %}<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>{% endif %}
+    <span>{{ teks }}</span>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+{% block isi %}{% endblock %}
+{% endblock %}

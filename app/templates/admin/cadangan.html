@@ -1,0 +1,40 @@
+{% extends "admin/_dasar.html" %}
+{% block judul %}Cadangan{% endblock %}
+{% block isi %}
+<div class="page-head">
+  <div>
+    <h1 class="p-title">Cadangan Basis Data</h1>
+    <p class="muted">Salinan otomatis dibuat setiap sebelum data diubah. Data aplikasi saat ini sampai {{ akhir }}.</p>
+  </div>
+</div>
+
+<section class="card adm-card">
+  {% if daftar %}
+  <div class="adm-tabel-wrap"><table class="src adm-tabel">
+    <tr><th>Waktu dibuat</th><th>Keterangan</th><th>Data sampai</th><th>Ukuran</th><th></th></tr>
+    {% for c in daftar %}
+    <tr>
+      <td>{{ c.waktu }}</td><td>{{ c.alasan }}</td><td>{{ c.data_akhir }}</td><td>{{ c.ukuran }}</td>
+      <td class="kanan">
+        <form method="post" action="{{ url_for('admin.pulihkan') }}"
+              onsubmit="return confirm('Pulihkan basis data ke kondisi {{ c.waktu }} (data sampai {{ c.data_akhir }})? Kondisi sekarang akan dicadangkan terlebih dahulu.');">
+          <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+          <input type="hidden" name="nama" value="{{ c.nama }}">
+          <button class="btn g sm" type="submit">Pulihkan</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table></div>
+  <p class="note">Memulihkan cadangan mengembalikan seluruh data ke kondisi saat cadangan dibuat, misalnya untuk
+    membatalkan unggahan yang keliru. Sebelum dipulihkan, kondisi saat ini juga dicadangkan, jadi langkah ini
+    selalu bisa dibatalkan. Hanya {{ 12 }} cadangan terbaru yang disimpan.</p>
+  {% else %}
+  <div class="adm-kosong">
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>
+    <p>Belum ada cadangan.</p>
+    <span class="muted">Cadangan pertama dibuat otomatis saat Anda mengunggah data bulan baru.</span>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends "admin/_dasar.html" %}
+{% block judul %}Model{% endblock %}
+{% macro baris(nama, a, b, tebal=false) %}
+{% set d = b.MAE - a.MAE %}
+<tr class="{{ 'tebal' if tebal }}">
+  <td>{{ nama }}</td>
+  <td>{{ a.MAE | angka(4) }}</td><td>{{ b.MAE | angka(4) }}</td>
+  <td class="{{ 'baik' if d < -0.00005 else ('buruk' if d > 0.00005 else '') }}">{{ ('−' if d < 0 else '+') ~ (d | abs | angka(4)) }}</td>
+  <td>{{ a.R2 | angka(3) }}</td><td>{{ b.R2 | angka(3) }}</td>
+</tr>
+{% endmacro %}
+{% block isi %}
+{% set jalan = status.status == 'berjalan' %}
+<div class="page-head">
+  <div>
+    <h1 class="p-title">Model Estimasi</h1>
+    <p class="muted">Latih ulang model dengan data terbaru, bandingkan dengan model aktif, lalu pilih yang lebih akurat.</p>
+  </div>
+</div>
+
+<div class="adm-stats">
+  <div class="card adm-stat">
+    <span class="muted">Model aktif</span>
+    <b>{{ {'xgb': 'XGBoost', 'rf': 'Random Forest', 'RF': 'Random Forest', 'gabungan': 'Gabungan RF + XGBoost', 'Gabungan': 'Gabungan RF + XGBoost'}.get(konf.pendekatan, konf.pendekatan or '-') }}</b>
+    <small class="muted">{% set reg = (konf.get('per_kelompok') or {}).items() | selectattr(1, 'equalto', 'regional') | map(attribute=0) | list %}{{ 'Regional: ' ~ reg | join(', ') ~ '; lainnya nasional' if reg else 'Model nasional' }}</small>
+  </div>
+  <div class="card adm-stat">
+    <span class="muted">Data latih sampai</span>
+    <b>{{ siap.akhir_latih }}</b>
+    <small class="muted">{{ 'Dilatih ulang ' ~ (konf.dilatih_ulang | waktu_teks) if konf.dilatih_ulang else 'Model hasil penelitian (skripsi)' }}</small>
+  </div>
+  <div class="card adm-stat">
+    <span class="muted">Akurasi uji</span>
+    <b>MAE {{ konf.metrik_uji_indonesia.MAE | angka(4) if konf.metrik_uji_indonesia else '–' }}</b>
+    <small class="muted">R² {{ konf.metrik_uji_indonesia.R2 | angka(3) if konf.metrik_uji_indonesia else '–' }} · {{ konf.periode_uji or 'Oktober 2025 – Juni 2026' }}</small>
+  </div>
+  <div class="card adm-stat">
+    <span class="muted">Data baru sejak dilatih</span>
+    <b>{{ siap.n_baru }} bulan</b>
+    <small class="muted">{{ 'Siap dilatih ulang' if siap.siap else 'Minimal ' ~ siap.perlu ~ ' bulan untuk latih ulang' }}</small>
+  </div>
+</div>
+
+<div class="adm-grid">
+  <section class="card adm-card">
+    <h2 class="adm-h">Latih ulang model</h2>
+    <ol class="how adm-how rapat">
+      <li><b>Uji yang adil</b><span>{% if siap.siap %}Model baru dilatih dengan data {{ siap.latih_cek }}, lalu model lama
+        dan model baru sama-sama diuji pada {{ siap.uji }}: bulan yang belum pernah dilihat keduanya.{% else %}Model baru
+        dilatih tanpa 3 bulan terakhir, lalu model lama dan model baru sama-sama diuji pada 3 bulan itu, yang belum pernah
+        dilihat keduanya.{% endif %}</span></li>
+      <li><b>Pengaturan tetap sama</b><span>Jenis model, pilihan nasional/regional, dan hyperparameter hasil penelitian
+        dipertahankan. Yang berubah hanya data latihnya.</span></li>
+      <li><b>Anda yang memutuskan</b><span>Jika dipakai, model baru dilatih sekali lagi dengan seluruh data
+        {%- if siap.siap %} sampai {{ siap.data_akhir }}{% endif %}. Model lama tetap disimpan di arsip.</span></li>
+    </ol>
+
+    {% if status.status == 'gagal' %}
+    <div class="alert bad small adm-alert"><span>Pelatihan terakhir gagal: {{ status.pesan }}</span></div>
+    {% endif %}
+
+    <div class="adm-progres" id="progres" {{ 'hidden' if not jalan }}>
+      <div class="adm-progres-h"><b id="p-tahap">{{ status.tahap or 'Menyiapkan' }}</b><span id="p-persen">{{ (status.persen or 0) | round | int }}%</span></div>
+      <div class="bar prog"><i id="p-bar" style="width: {{ status.persen or 0 }}%"></i></div>
+      <small class="muted">Biasanya 1–5 menit. Halaman ini boleh ditinggal; proses tetap berjalan.</small>
+    </div>
+
+    {% if not siap.siap %}
+    <p class="note">Latih ulang bisa dilakukan setelah ada minimal {{ siap.perlu }} bulan data baru sejak model terakhir
+      dilatih ({{ siap.akhir_latih }}). Saat ini ada {{ siap.n_baru }} bulan. Tambahkan data lewat menu
+      <a href="{{ url_for('admin.unggah') }}">Unggah Data</a>.</p>
+    {% endif %}
+    <form method="post" action="{{ url_for('admin.model_latih') }}" class="adm-aksi" id="f-latih">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+      <button class="btn p sm" type="submit" id="b-latih" {{ 'disabled' if jalan or not siap.siap }}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+        {{ 'Sedang melatih…' if jalan else 'Mulai Latih Ulang' }}</button>
+    </form>
+  </section>
+
+  <section class="card adm-card">
+    <h2 class="adm-h">Arsip model</h2>
+    {% if arsip %}
+    <div class="adm-tabel-wrap"><table class="src adm-tabel">
+      <tr><th>Disimpan</th><th>Data latih sampai</th><th>MAE uji</th><th></th></tr>
+      {% for a in arsip[:6] %}
+      <tr><td>{{ a.waktu }}<br><small class="muted">{{ a.alasan }}</small></td><td>{{ a.latih_sampai }}</td>
+        <td>{{ a.mae | angka(4) if a.mae else '–' }}</td>
+        <td class="kanan"><form method="post" action="{{ url_for('admin.model_kembalikan') }}"
+              onsubmit="return confirm('Kembalikan model ke versi ini (data latih sampai {{ a.latih_sampai }})? Model yang aktif sekarang akan diarsipkan terlebih dahulu.');">
+          <input type="hidden" name="csrf" value="{{ csrf_token() }}"><input type="hidden" name="id" value="{{ a.id }}">
+          <button class="btn g sm" type="submit">Kembalikan</button></form></td></tr>
+      {% endfor %}
+    </table></div>
+    {% else %}
+    <div class="adm-kosong">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9M10 13h4"/></svg>
+      <p>Belum ada arsip.</p>
+      <span class="muted">Setiap kali model diganti, model sebelumnya disimpan di sini dan bisa dikembalikan.</span>
+    </div>
+    {% endif %}
+  </section>
+</div>
+
+{% if kand and not jalan %}
+<section class="card adm-card" id="hasil">
+  <div class="card-h wrap">
+    <div>
+      <h2>Hasil perbandingan</h2>
+      <p class="muted small-2">Diuji pada {{ kand.uji_label }} · dilatih {{ kand.dibuat | waktu_teks }}</p>
+    </div>
+    {% if kand.sudah_dipasang %}<span class="chip ok">Sedang dipakai</span>
+    {% elif kand.lebih_baik %}<span class="chip ok">Model baru lebih akurat</span>
+    {% else %}<span class="chip chip-kering">Model lama masih lebih akurat</span>{% endif %}
+  </div>
+  {% set L, B = kand.lama.Indonesia, kand.baru.Indonesia %}
+  <div class="adm-angka">
+    <div><span class="muted small">MAE model lama</span><b>{{ L.MAE | angka(4) }}</b><small class="muted">R² {{ L.R2 | angka(3) }}</small></div>
+    <div><span class="muted small">MAE model baru</span><b class="{{ 'ok-t' if kand.lebih_baik }}">{{ B.MAE | angka(4) }}</b><small class="muted">R² {{ B.R2 | angka(3) }}</small></div>
+    <div><span class="muted small">Perubahan galat</span><b>{{ ('−' if kand.perubahan_persen < 0 else '+') ~ (kand.perubahan_persen | abs | angka(1)) }}%</b><small class="muted">{{ 'lebih kecil = lebih baik' }}</small></div>
+  </div>
+  <p class="note {{ 'ok' if kand.lebih_baik else 'warn' }}">
+    {% if kand.lebih_baik %}Pada {{ kand.uji_label }}, rata-rata selisih estimasi model baru dengan SMAP L4 adalah
+    {{ B.MAE | angka(4) }} m³/m³, lebih kecil {{ kand.perubahan_persen | abs | angka(1) }}% dibanding model lama
+    ({{ L.MAE | angka(4) }} m³/m³). Model baru disarankan untuk dipakai.
+    {% else %}Model baru tidak lebih akurat daripada model lama pada {{ kand.uji_label }}
+    ({{ B.MAE | angka(4) }} vs {{ L.MAE | angka(4) }} m³/m³). Sebaiknya tetap memakai model lama.{% endif %}
+  </p>
+
+  <div class="adm-tabel-wrap"><table class="src adm-tabel adm-banding">
+    <tr><th>Cakupan</th><th>MAE lama</th><th>MAE baru</th><th>Selisih</th><th>R² lama</th><th>R² baru</th></tr>
+    {{ baris('Seluruh Indonesia', L, B, true) }}
+    <tr class="sub"><td colspan="6">Per bulan</td></tr>
+    {% for n, a in kand.lama.per_bulan.items() %}{{ baris(n, a, kand.baru.per_bulan[n]) }}{% endfor %}
+    <tr class="sub"><td colspan="6">Per kelompok wilayah</td></tr>
+    {% for n, a in kand.lama.per_kelompok.items() %}{{ baris(n, a, kand.baru.per_kelompok[n]) }}{% endfor %}
+    <tr class="sub"><td colspan="6">Wilayah khusus</td></tr>
+    {% for n, a in kand.lama.khusus.items() %}{{ baris(n | replace('(>=20%)', '(gambut ≥ 20%)'), a, kand.baru.khusus[n]) }}{% endfor %}
+  </table></div>
+
+  {% if not kand.sudah_dipasang %}
+  <form method="post" action="{{ url_for('admin.model_pasang') }}" id="f-pasang">
+    <input type="hidden" name="csrf" value="{{ csrf_token() }}"><input type="hidden" name="id" value="{{ kand.id }}">
+    {% if not kand.lebih_baik %}
+    <label class="adm-cek-box warn"><input type="checkbox" required>
+      <span>Saya memahami model baru tidak lebih akurat pada pengujian, tetapi tetap ingin memakainya.</span></label>
+    {% endif %}
+    <div class="adm-aksi">
+      <button class="btn {{ 'p' if kand.lebih_baik else 's' }} sm" type="submit">Pakai Model Baru</button>
+      <span class="muted small adm-aksi-t">Model lama otomatis diarsipkan dan bisa dikembalikan kapan saja.</span>
+    </div>
+  </form>
+  {% endif %}
+  <p class="muted small adm-p">Grafik faktor yang paling berpengaruh (SHAP global) di halaman hasil tetap berasal dari
+    analisis penelitian; penjelasan per wilayah (SHAP lokal) otomatis mengikuti model yang aktif.</p>
+</section>
+{% endif %}
+
+{% if jalan %}
+<script>
+(function () {
+  const tahap = document.getElementById('p-tahap'), persen = document.getElementById('p-persen'), bar = document.getElementById('p-bar');
+  async function cek() {
+    try {
+      const s = await (await fetch('{{ url_for('admin.model_status') }}', {cache: 'no-store'})).json();
+      tahap.textContent = s.tahap || ''; persen.textContent = Math.round(s.persen || 0) + '%'; bar.style.width = (s.persen || 0) + '%';
+      if (s.status !== 'berjalan') { location.replace('{{ url_for('admin.model') }}?t=' + Date.now() + '#hasil'); return; }
+    } catch (e) {}
+    setTimeout(cek, 1500);
+  }
+  setTimeout(cek, 1000);
+})();
+</script>
+{% endif %}
+{% endblock %}

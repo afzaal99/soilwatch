@@ -3,10 +3,13 @@
 ============================================================
 Mewarnai setiap kabupaten/kota dengan soil moisture SMAP L4 bulan terbaru di dataset.
 
-Batas wilayah: FAO GAUL 2015 (data/geo/batas_kabkota_gaul2015.geojson, hasil script 02)
+Batas wilayah: FAO GAUL 2025 (data/geo/batas_kabkota_gaul2025.geojson, hasil script 02)
 jika sudah ada; jika belum, batas pratinjau GADM lama (lihat scripts/peta.py).
 
 Keluaran: app/static/img/peta_beranda.svg, app/static/data/ringkasan_beranda.json
+
+Fungsi buat(df) juga dipanggil dashboard admin setiap kali data bulan baru disimpan,
+dengan data yang dibaca dari basis data aplikasi.
 """
 import json
 import sys
@@ -32,8 +35,8 @@ def warna(v):
     return RAMP[int(t * len(RAMP))]
 
 
-def main():
-    df = pd.read_csv(DATA_PROCESSED / "dataset_bersih.csv", parse_dates=["periode"])
+def buat(df, cetak=print):
+    """df: kolom ADM2_NAME, ADM1_NAME, kelompok_wilayah, periode (datetime), soil_moisture."""
     akhir = df["periode"].max()
     wil = daftar_wilayah(df)
     terakhir = df[df["periode"] == akhir].merge(wil, on=["ADM2_NAME", "ADM1_NAME"])
@@ -44,7 +47,8 @@ def main():
     proj = proyektor(W, H, PAD)
     paths = []
     for wid, cincin in poli:
-        d = path_d(cincin, proj, 0.6)
+        # wilayah sangat kecil (mis. Kota Sibolga ~11 km2) bisa hilang saat titik dirampingkan -> tanpa perampingan
+        d = path_d(cincin, proj, 0.6) or path_d(cincin, proj, 0)
         if not d:
             continue
         v = nilai.get(wid) if wid is not None else None
@@ -74,8 +78,13 @@ def main():
     }
     OUT_JSON.parent.mkdir(parents=True, exist_ok=True)
     OUT_JSON.write_text(json.dumps(ringkasan, ensure_ascii=False, indent=1), encoding="utf-8")
-    print(ringkasan)
-    print(f"batas wilayah: {sumber}, {len(paths)} poligon -> {OUT_SVG}")
+    cetak(ringkasan)
+    cetak(f"batas wilayah: {sumber}, {len(paths)} poligon -> {OUT_SVG}")
+    return ringkasan
+
+
+def main():
+    buat(pd.read_csv(DATA_PROCESSED / "dataset_bersih.csv", parse_dates=["periode"]))
 
 
 if __name__ == "__main__":

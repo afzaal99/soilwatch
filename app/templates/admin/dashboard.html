@@ -1,0 +1,128 @@
+{% extends "admin/_dasar.html" %}
+{% block judul %}Dashboard{% endblock %}
+{% block isi %}
+<div class="page-head">
+  <div>
+    <div class="title-row">
+      <h1 class="p-title">Dashboard Admin</h1>
+      <span class="chip">Masuk sebagai {{ session.admin }}</span>
+    </div>
+    <p class="muted">Kelola data bulanan dan pantau akurasi model SoilWatch ID.</p>
+  </div>
+  <div class="head-right">
+    <a class="btn p sm" href="{{ url_for('admin.unggah') }}">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg>Unggah Data Bulan Baru</a>
+  </div>
+</div>
+
+{% if jadwal.siap %}
+<div class="alert warn adm-banner">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+  <span>Data <b>{{ jadwal.siap | join(', ') }}</b> sudah aman diunggah dan belum ada di aplikasi.
+    <a href="{{ url_for('admin.unggah') }}">Lihat cara mengunggah</a></span>
+</div>
+{% endif %}
+{% if terakhir_perhatian %}
+<div class="alert bad adm-banner">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>
+  <span>Akurasi model pada bulan terakhir menurun (MAE lebih dari {{ ambang | angka(1) }}× hasil pengujian).
+    Pertimbangkan untuk melatih ulang model dengan data terbaru.</span>
+</div>
+{% endif %}
+
+<div class="adm-stats">
+  <div class="card adm-stat">
+    <span class="muted">Data tersedia</span>
+    <b>{{ akhir }}</b>
+    <small class="muted">{{ n_bulan }} bulan, mulai {{ awal }}</small>
+  </div>
+  <div class="card adm-stat">
+    <span class="muted">Kabupaten/kota</span>
+    <b>{{ n_wilayah }}</b>
+    <small class="muted">Batas FAO GAUL 2025</small>
+  </div>
+  <div class="card adm-stat">
+    <span class="muted">Model aktif</span>
+    <b>{{ {'xgb': 'XGBoost', 'rf': 'Random Forest', 'RF': 'Random Forest', 'gabungan': 'Gabungan RF + XGBoost', 'Gabungan': 'Gabungan RF + XGBoost'}.get(konf.pendekatan, konf.pendekatan or 'Model sementara') }}</b>
+    <small class="muted">{% if mae_uji %}Uji: MAE {{ mae_uji | angka(4) }} · R² {{ r2_uji | angka(3) }}{% else %}Belum ada hasil pengujian{% endif %}</small>
+  </div>
+  <div class="card adm-stat">
+    <span class="muted">Bulan berikutnya</span>
+    <b>{{ jadwal.bulan_berikut }}</b>
+    <small class="muted">Aman diunggah mulai {{ jadwal.bulan_berikut_mulai }}</small>
+  </div>
+</div>
+
+<div class="adm-grid">
+  <section class="card adm-card">
+    <div class="card-h wrap">
+      <div>
+        <h2>Pemantauan akurasi model</h2>
+        <p class="muted small-2">Setiap data bulan baru dibandingkan dengan estimasi model sebelum disimpan.</p>
+      </div>
+    </div>
+    {% if grafik %}
+    <div class="trend-gulir"><svg class="adm-mae" viewBox="0 0 {{ grafik.W }} {{ grafik.H }}" role="img" aria-label="Grafik MAE per bulan">
+      {% for y in grafik.gy %}<line x1="{{ grafik.L }}" x2="{{ grafik.W - grafik.R }}" y1="{{ y.y }}" y2="{{ y.y }}" class="gl"/><text x="{{ grafik.L - 8 }}" y="{{ y.y + 4 }}" text-anchor="end">{{ y.teks }}</text>{% endfor %}
+      {% for b in grafik.batang %}
+      <rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" rx="3" class="bt {{ b.kelas }}"><title>{{ b.bulan }}: MAE {{ b.teks }}</title></rect>
+      <text x="{{ b.cx }}" y="{{ grafik.H - 8 }}" text-anchor="middle">{{ b.pendek }}</text>
+      {% endfor %}
+      {% for g in grafik.garis %}<line x1="{{ grafik.L }}" x2="{{ grafik.W - grafik.R }}" y1="{{ g.y }}" y2="{{ g.y }}" class="ref {{ g.kelas }}"/>
+      <text x="{{ grafik.W - grafik.R - 4 }}" y="{{ g.y - 5 }}" text-anchor="end" class="ref-t {{ g.kelas }}">{{ g.teks }}</text>{% endfor %}
+    </svg></div>
+    <table class="src adm-tabel">
+      <tr><th>Bulan</th><th>MAE</th><th>R²</th><th>Status</th></tr>
+      {% for e in evals %}
+      <tr><td>{{ e.label }}</td>
+        <td>{{ e.mae | angka(4) }}</td><td>{{ e.r2 | angka(3) }}</td>
+        <td>{% if mae_uji and e.mae > mae_uji * ambang %}<span class="chip bad sm">Perlu perhatian</span>{% else %}<span class="chip ok sm">Normal</span>{% endif %}</td></tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <div class="adm-kosong">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 19V5M4 19h16"/><path d="M8 15l3-4 3 2 5-6"/></svg>
+      <p>Belum ada bulan baru yang dievaluasi.</p>
+      <span class="muted">Evaluasi berjalan otomatis setiap kali data bulan baru diunggah.</span>
+    </div>
+    {% endif %}
+    <p class="note">MAE adalah rata-rata selisih estimasi model dengan nilai acuan SMAP L4 (m³/m³); makin kecil makin baik.
+      {% if mae_uji %}Bulan ditandai <b>perlu perhatian</b> jika MAE-nya lebih dari {{ ambang | angka(1) }}× MAE pengujian
+      ({{ mae_uji | angka(4) }}).{% endif %}</p>
+  </section>
+
+  <div class="adm-kolom">
+    <section class="card adm-card">
+      <div class="card-h"><h2>Riwayat aktivitas</h2></div>
+      {% if riwayat %}
+      <ul class="adm-riwayat">
+        {% for r in riwayat %}
+        <li>
+          <span class="adm-titik {{ 'pulih' if r.jenis == 'Pemulihan' }}" aria-hidden="true"></span>
+          <div><b>{{ r.jenis }}</b> <span class="muted small">· {{ r.waktu_teks }}</span>
+            <p>{{ r.keterangan }}</p>
+            {% if r.berkas %}<span class="muted small">Berkas: {{ r.berkas }}</span>{% endif %}</div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="muted adm-kosong-t">Belum ada aktivitas. Riwayat unggah data dan pemulihan cadangan akan tampil di sini.</p>
+      {% endif %}
+    </section>
+
+    <section class="card adm-card">
+      <div class="card-h">
+        <h2>Latih ulang model</h2>
+        {% if status_latih.status == 'berjalan' %}<span class="chip sm">Sedang berjalan</span>
+        {% elif kand and not kand.sudah_dipasang %}<span class="chip {{ 'ok' if kand.lebih_baik else 'chip-kering' }} sm">Hasil siap ditinjau</span>
+        {% elif latih.siap %}<span class="chip ok sm">Siap</span>{% endif %}
+      </div>
+      <p class="muted small-2 adm-p">Model aktif dilatih dengan data sampai <b>{{ latih.akhir_latih }}</b>.
+        {% if latih.siap %}Sudah ada {{ latih.n_baru }} bulan data baru, jadi model bisa dilatih ulang dan dibandingkan
+        dengan model aktif.{% else %}Latih ulang tersedia setelah ada minimal {{ latih.perlu }} bulan data baru
+        (sekarang {{ latih.n_baru }}).{% endif %}</p>
+      <a class="btn {{ 'p' if (latih.siap or kand) else 'g' }} sm" href="{{ url_for('admin.model') }}">{{ 'Lihat hasil perbandingan' if kand and not kand.sudah_dipasang else 'Kelola model' }}</a>
+    </section>
+  </div>
+</div>
+{% endblock %}

@@ -5,7 +5,7 @@ Sumber : Trase, "Indonesia - Peatland area (kabupaten)", diturunkan dari Peta La
          Indonesia Skala 1:50.000 Edisi Desember 2019 (BBSDLP, Kementerian Pertanian).
          https://trase.earth/open-data/datasets/spatial-metrics-indonesia-peat-area
 Masukan: data/geo/gambut_kabupaten_trase.csv   (file unduhan Trase, 514 kabupaten/kota)
-         data/geo/batas_kabkota_gaul2015.geojson (hasil script 02, untuk luas wilayah)
+         data/geo/batas_kabkota_gaul2025.geojson (hasil script 02, untuk luas wilayah)
          data/geo/penanda_lahan_kabkota.csv     (hasil script 02)
 Keluaran: kolom prop_gambut dan penanda_gambut ditambahkan ke penanda_lahan_kabkota.csv
           reports/02b_gambut_per_wilayah.csv    (rincian per wilayah, untuk pengecekan)
@@ -13,11 +13,9 @@ Keluaran: kolom prop_gambut dan penanda_gambut ditambahkan ke penanda_lahan_kabk
 Langkah:
 1. Ambil luas gambut (hektar) per kabupaten/kota Trase. Luas gambut sama untuk semua tahun
    (peta 2019 yang sama), jadi cukup satu tahun.
-2. Cocokkan 514 kabupaten/kota (pembagian wilayah terbaru) ke 442 wilayah GAUL 2015.
-   - Nama yang sama -> langsung.
-   - Kabupaten/kota hasil pemekaran setelah GAUL 2015 -> digabung ke wilayah induknya
-     (tabel INDUK di bawah; hanya yang memiliki gambut yang berpengaruh).
-3. prop_gambut = total luas gambut / luas wilayah GAUL 2015 (dihitung dari poligonnya).
+2. Cocokkan 514 kabupaten/kota Trase ke 514 wilayah GAUL 2025 berdasarkan nama.
+   Pembagian wilayahnya sama, jadi cocok 1:1; hanya 9 nama yang ditulis berbeda (tabel ALIAS).
+3. prop_gambut = luas gambut / luas wilayah GAUL 2025 (dihitung dari poligonnya).
 4. penanda_gambut = 1 jika prop_gambut >= 20%.
 """
 import json
@@ -34,27 +32,21 @@ from peta import daftar_wilayah
 
 GEO = ROOT / "data" / "geo"
 TRASE = GEO / "gambut_kabupaten_trase.csv"
-GAUL = GEO / "batas_kabkota_gaul2015.geojson"
+GAUL = GEO / "batas_kabkota_gaul2025.geojson"
 PENANDA = GEO / "penanda_lahan_kabkota.csv"
 AMBANG = 0.20
 
-# Kabupaten/kota hasil pemekaran (nama Trase) -> wilayah induk di GAUL 2015 (ADM2_NAME)
-INDUK = {
-    "DEIYAI": "Paniai", "INTAN JAYA": "Paniai", "DOGIYAI": "Nabire", "PUNCAK": "Puncakjaya",
-    "MAMBERAMO RAYA": "Sarmi", "MAMBERAMO TENGAH": "Jayawijaya", "YALIMO": "Jayawijaya",
-    "KEPULAUAN YAPEN": "Yapen", "MAYBRAT": "Sorong",
-    "KAYONG UTARA": "Ketapang", "KUBU RAYA": "Pontianak", "MEMPAWAH": "Pontianak",
-    "TANA TIDUNG": "Bulungan",
-    "KEPULAUAN MERANTI": "Bengkalis",
-    # Poligon Kota Dumai di GAUL 2015 hanya ~130 km2 (pusat kota); sebagian besar wilayah Dumai
-    # (termasuk gambutnya) di GAUL 2015 masuk poligon Bengkalis, jadi gambut Dumai digabung ke sana.
-    "KOTA DUMAI": "Bengkalis",
-    "KOTA SUBULUSSALAM": "Aceh Singkil", "KOTA SUNGAI PENUH": "Kerinci",
-    "LABUHANBATU SELATAN": "Labuhanbatu", "LABUHANBATU UTARA": "Labuhanbatu", "NIAS UTARA": "Nias",
-    "PASAMAN BARAT": "Kota Pasaman Barat",   # di GAUL 2015 Kab. Pasaman Barat tertulis "Kota Pasaman Barat"
-    "MESUJI": "Tulangbawang",
-    "MUSI RAWAS UTARA": "Musirawas", "PENUKAL ABAB LEMATANG ILIR": "Muaraenim",
-    "MAMUJU TENGAH": "Mamuju", "PASANGKAYU": "Mamuju Utara", "MOROWALI UTARA": "Morowali",
+# Nama Trase yang ditulis berbeda dengan GAUL 2025 (nama Trase -> ADM2_NAME GAUL 2025)
+ALIAS = {
+    "ADMINISTRASI KEPULAUAN SERIBU": "Kepulauan Seribu",
+    "KOTA ADMINISTRASI JAKARTA BARAT": "Kota Jakarta Barat",
+    "KOTA ADMINISTRASI JAKARTA PUSAT": "Kota Jakarta Pusat",
+    "KOTA ADMINISTRASI JAKARTA SELATAN": "Kota Jakarta Selatan",
+    "KOTA ADMINISTRASI JAKARTA TIMUR": "Kota Jakarta Timur",
+    "KOTA ADMINISTRASI JAKARTA UTARA": "Kota Jakarta Utara",
+    "KEP. SIAU TAGULANDANG BIARO": "Siau Tagulandang Biaro",
+    "MAHAKAM ULU": "Mahakam Hulu",
+    "TOBA": "Toba Samosir",
 }
 
 
@@ -90,7 +82,7 @@ def main():
     wil = daftar_wilayah(pd.read_csv(DATA_PROCESSED / "dataset_bersih.csv"))
     idx = {norm(a): (a, b) for a, b in zip(wil["ADM2_NAME"], wil["ADM1_NAME"])}
 
-    # luas wilayah GAUL 2015
+    # luas wilayah GAUL 2025
     luas = {}
     for ft in json.loads(GAUL.read_text(encoding="utf-8"))["features"]:
         p = ft["properties"]
@@ -102,10 +94,7 @@ def main():
     t = t[t["year"] == t["year"].max()]
     gambut, tak_cocok = {}, []
     for nama, ha in zip(t["region"], t["peatland_area_hectares"]):
-        if nama in INDUK:
-            k = idx.get(norm(INDUK[nama]))
-        else:
-            k = idx.get(norm(nama))
+        k = idx.get(norm(ALIAS.get(nama, nama)))
         if k is None:
             tak_cocok.append((nama, ha))
             continue
@@ -117,7 +106,7 @@ def main():
           f"({100 * (1 - hilang / total):.2f}%)")
     bergambut = [(n, ha) for n, ha in tak_cocok if ha > 0]
     if bergambut:
-        print("PERINGATAN, kabupaten bergambut belum tercocokkan (tambahkan ke INDUK):")
+        print("PERINGATAN, kabupaten bergambut belum tercocokkan (tambahkan ke ALIAS):")
         for n, ha in bergambut:
             print(f"   {n}: {ha:,.0f} ha")
 

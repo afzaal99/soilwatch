@@ -89,6 +89,34 @@ def _baca_konfigurasi():
 KONF = _baca_konfigurasi()
 
 
+def _versi():
+    """Penanda versi data: waktu ubah basis data dan berkas model terpilih."""
+    f = ROOT / "models" / "model_terpilih.json"
+    return (DB.stat().st_mtime_ns, f.stat().st_mtime_ns if f.exists() else 0)
+
+
+VERSI = _versi()
+
+
+def muat_ulang():
+    """Membaca ulang basis data dan konfigurasi model (dipanggil setelah admin mengunggah data,
+    memulihkan cadangan, atau melatih ulang model). Semua cache ikut dikosongkan."""
+    global DATA, FITUR, STAT, WILAYAH, ID_PERIODE, KONF, VERSI
+    DATA = _muat_awal()
+    FITUR, STAT, WILAYAH = DATA["fitur"], DATA["stat"], DATA["wilayah"]
+    ID_PERIODE = {p: i for i, p in enumerate(DATA["periode"])}
+    KONF = _baca_konfigurasi()
+    for fn in (_model, _penjelas_rf, data_peta):
+        fn.cache_clear()
+    VERSI = _versi()
+
+
+def cek_versi():
+    """Muat ulang jika basis data/model berubah (mis. diperbarui oleh proses server lain)."""
+    if _versi() != VERSI:
+        muat_ulang()
+
+
 def galat_gambut(v):
     """Galat model pada wilayah gambut (data uji, dari script 05) dan rentang perkiraan v +- MAE."""
     m = next((d for n, d in ((KONF or {}).get("metrik_uji_wilayah_khusus") or {}).items()
@@ -289,6 +317,15 @@ def data_peta():
     return {"periode": DATA["periode"], "periode_label": DATA["periode_label"],
             "wilayah": [[w["label"], w["prov"], w["danau"]] for w in WILAYAH], "sm": sm,
             "penanda": DATA["penanda"], "penanda_contoh": DATA["penanda_contoh"]}
+
+
+BULAN_PANJANG = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September",
+                 "Oktober", "November", "Desember"]
+
+
+def label_bulan(kode):
+    """'2026-09' -> 'September 2026'"""
+    return f"{BULAN_PANJANG[int(kode[5:7]) - 1]} {kode[:4]}"
 
 
 BLN_PENDEK = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"]

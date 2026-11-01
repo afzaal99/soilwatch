@@ -1,0 +1,142 @@
+{% extends "admin/_dasar.html" %}
+{% block judul %}Unggah Data{% endblock %}
+{% block isi %}
+<div class="page-head">
+  <div>
+    <h1 class="p-title">Unggah Data Bulanan</h1>
+    <p class="muted">Tambahkan data bulan baru dari Google Earth Engine ke aplikasi.</p>
+  </div>
+  <ol class="steps" aria-label="Langkah">
+    <li class="step on" aria-current="step"><span class="step-dot">1</span><span>Unggah berkas</span></li>
+    <li class="step-line" aria-hidden="true"></li>
+    <li class="step"><span class="step-dot">2</span><span>Periksa</span></li>
+    <li class="step-line" aria-hidden="true"></li>
+    <li class="step"><span class="step-dot">3</span><span>Simpan</span></li>
+  </ol>
+</div>
+
+<div class="adm-grid unggah">
+  <section class="card adm-card">
+    <h2 class="adm-h">Pilih berkas CSV</h2>
+    <form method="post" enctype="multipart/form-data" id="f-unggah">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+      <label class="adm-drop" id="drop">
+        <input type="file" name="berkas" id="berkas" accept=".csv,text/csv" required>
+        <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M12 18v-6M9 15l3-3 3 3"/></svg>
+        <b id="drop-t">Klik untuk memilih berkas, atau seret ke sini</b>
+        <span class="muted small">Berkas .csv hasil script 09 dari Google Drive, maksimal 20 MB</span>
+      </label>
+      <button class="btn p wide" type="submit" id="b-periksa">Periksa Berkas</button>
+    </form>
+    <div class="note">
+      <b>Yang diperiksa sebelum data disimpan:</b>
+      <ul class="adm-cek">
+        <li>Kolom lengkap dan {{ jumlah_wilayah }} kabupaten/kota sesuai batas wilayah data latih</li>
+        <li>Bulan menyambung dengan data terakhir ({{ jadwal.data_akhir }}), tanpa bulan terlewat</li>
+        <li>Nilai di dalam batas fisik; artefak dan nilai kosong dibersihkan dengan aturan yang sama seperti data latih</li>
+        <li>Akurasi model pada bulan baru dibanding nilai acuan SMAP L4</li>
+      </ul>
+      Data belum disimpan sampai Anda menekan tombol <b>Simpan</b> di halaman berikutnya.
+    </div>
+  </section>
+
+  <section class="card adm-card" id="panduan">
+    <h2 class="adm-h">Panduan pembaruan data</h2>
+    <div class="adm-jadwal">
+      <div><span class="muted small">Hari ini</span><b>{{ jadwal.hari_ini }}</b></div>
+      <div><span class="muted small">Sudah aman sampai</span><b>{{ jadwal.terakhir_aman }}</b></div>
+      <div><span class="muted small">{{ jadwal.berikut_aman }} aman mulai</span><b>{{ jadwal.berikut_aman_mulai }}</b></div>
+    </div>
+    {% if jadwal.siap %}
+    <p class="note ok">Bulan yang siap diunggah sekarang: <b>{{ jadwal.siap | join(', ') }}</b>.</p>
+    {% else %}
+    <p class="note">Data aplikasi sudah sampai {{ jadwal.data_akhir }}. Bulan berikutnya ({{ jadwal.bulan_berikut }})
+      aman diunggah mulai <b>{{ jadwal.bulan_berikut_mulai }}</b>.</p>
+    {% endif %}
+
+    <h3 class="adm-h3">Langkah mengambil data</h3>
+    <ol class="how adm-how">
+      <li><b>Pilih bulan, lalu salin script</b>
+        <span>Script Google Earth Engine dibuat otomatis untuk bulan yang dipilih.</span>
+        <div class="adm-script" id="gen">
+          <label class="adm-pilih"><span>Dari</span>
+            <select id="g-dari">{% for k, l in pilihan_bulan.daftar %}<option value="{{ k }}" {{ 'selected' if k == pilihan_bulan.dari }}>{{ l }}{{ ' · sudah ada' if k in pilihan_bulan.ada }}</option>{% endfor %}</select></label>
+          <label class="adm-pilih"><span>Sampai</span>
+            <select id="g-sampai">{% for k, l in pilihan_bulan.daftar %}<option value="{{ k }}" {{ 'selected' if k == pilihan_bulan.sampai }}>{{ l }}{{ ' · sudah ada' if k in pilihan_bulan.ada }}</option>{% endfor %}</select></label>
+          <div class="adm-script-aksi">
+            <button type="button" class="btn p sm" id="g-salin">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>Salin Script</span></button>
+            <a class="btn s sm" id="g-unduh" href="#">Unduh .js</a>
+          </div>
+          <small class="muted" id="g-info"></small>
+        </div>
+      </li>
+      <li><b>Buka Google Earth Engine dan tempel</b><span>
+        <a class="link-more" href="https://code.earthengine.google.com/" target="_blank" rel="noopener">Buka Code Editor ↗</a>,
+        klik <b>NEW → File</b> di tab Scripts (cukup sekali, berikutnya pakai file yang sama), lalu hapus isi editor
+        (Ctrl+A) dan tempel script (Ctrl+V). Perlu akun Google yang sudah terdaftar di Earth Engine.</span></li>
+      <li><b>Klik Run, lalu periksa Console</b><span>Pastikan semua bulan bertanda ✅. Bulan bertanda ⚠️ datanya belum
+        lengkap; ambil lagi nanti.</span></li>
+      <li><b>Jalankan ekspor dan unduh berkasnya</b><span>Di tab <b>Tasks</b>, klik <b>RUN</b> lalu <b>RUN</b> lagi di
+        jendela konfirmasi. Setelah selesai (2–10 menit), unduh CSV dari Google Drive folder <code>skripsi_gee</code>,
+        lalu unggah di kotak sebelah kiri.</span></li>
+    </ol>
+
+    <h3 class="adm-h3">Kapan data sebulan dianggap lengkap?</h3>
+    <table class="src">
+      <tr><th>Sumber</th><th>Variabel</th><th>Data lengkap</th></tr>
+      {% for s, v, t in sumber %}<tr><td>{{ s }}</td><td>{{ v }}</td><td>{{ t }}</td></tr>{% endfor %}
+    </table>
+    <p class="muted small-2 adm-p">Karena curah hujan CHIRPS paling lambat tersedia, data bulan apa pun baru aman diunggah
+      <b>mulai tanggal 25 bulan berikutnya</b>. Contoh: data Oktober aman diunggah mulai 25 November.</p>
+    <p class="muted small-2 adm-p">Produksi CHIRPS versi 2 dijadwalkan berjalan paralel dengan versi 3 hingga akhir 2026.
+      Jika curah hujan pada berkas kosong, kemungkinan versi 2 sudah dihentikan: sumber curah hujan perlu diganti ke
+      CHIRPS versi 3, seluruh data diekstrak ulang, dan model dilatih ulang.</p>
+  </section>
+</div>
+
+<script>
+(function () {
+  const inp = document.getElementById('berkas'), drop = document.getElementById('drop'),
+        teks = document.getElementById('drop-t'), form = document.getElementById('f-unggah'),
+        tombol = document.getElementById('b-periksa');
+  const tampil = () => { if (inp.files.length) { teks.textContent = inp.files[0].name; drop.classList.add('isi'); } };
+  inp.addEventListener('change', tampil);
+  ['dragenter', 'dragover'].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.add('seret'); }));
+  ['dragleave', 'drop'].forEach(e => drop.addEventListener(e, () => drop.classList.remove('seret')));
+  drop.addEventListener('drop', ev => { ev.preventDefault(); if (ev.dataTransfer.files.length) { inp.files = ev.dataTransfer.files; tampil(); } });
+  form.addEventListener('submit', () => { tombol.disabled = true; tombol.textContent = 'Memeriksa data…'; });
+
+  // pembuat script GEE
+  const dari = document.getElementById('g-dari'), sampai = document.getElementById('g-sampai'),
+        salin = document.getElementById('g-salin'), unduh = document.getElementById('g-unduh'),
+        info = document.getElementById('g-info'), ADA = {{ pilihan_bulan.ada | list | tojson }},
+        AMAN = {{ pilihan_bulan.aman | tojson }};
+  const url = (u) => `{{ url_for('admin.script09') }}?dari=${dari.value}&sampai=${sampai.value}${u ? '&unduh=1' : ''}`;
+  const NAMA = Object.fromEntries([...dari.options].map(o => [o.value, o.text.replace(' · sudah ada', '')]));
+  function perbarui() {
+    let a = dari.value, b = sampai.value;
+    if (b < a) { sampai.value = a; b = a; }
+    unduh.href = url(true);
+    const bln = [...dari.options].map(o => o.value).filter(k => k >= a && k <= b);
+    const ada = bln.filter(k => ADA.includes(k)), belum = bln.filter(k => k > AMAN);
+    let t = `${bln.length} bulan: ${NAMA[a]}${a !== b ? ' – ' + NAMA[b] : ''}.`;
+    if (ada.length === bln.length) t += ' Semua bulan ini sudah ada di aplikasi (cocok untuk uji konsistensi).';
+    else if (ada.length) t += ` ${ada.length} bulan sudah ada di aplikasi.`;
+    if (belum.length) t += ` Perhatian: ${belum.map(k => NAMA[k]).join(', ')} belum lewat tanggal aman.`;
+    info.textContent = t;
+  }
+  dari.addEventListener('change', perbarui); sampai.addEventListener('change', perbarui); perbarui();
+  salin.addEventListener('click', async () => {
+    const lbl = salin.querySelector('span');
+    try {
+      const r = await fetch(url(false)); const teks = await r.text();
+      if (!r.ok) throw new Error(teks);
+      await navigator.clipboard.writeText(teks);
+      lbl.textContent = 'Tersalin ✓';
+    } catch (e) { lbl.textContent = 'Gagal, pakai Unduh'; }
+    setTimeout(() => { lbl.textContent = 'Salin Script'; }, 2500);
+  });
+})();
+</script>
+{% endblock %}

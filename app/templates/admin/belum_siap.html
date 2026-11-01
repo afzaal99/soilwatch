@@ -1,0 +1,15 @@
+{% extends "admin/_dasar.html" %}
+{% block judul %}Atur Akun Admin{% endblock %}
+{% block isi %}
+<section class="card adm-masuk lebar">
+  <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="" width="44" height="44">
+  <h1>Akun admin belum dibuat</h1>
+  <p class="muted">Demi keamanan, akun admin tidak dibuat dari halaman web, tetapi dari komputer server.</p>
+  <ol class="how adm-how">
+    <li><b>Buka terminal di folder <code>soilwatch</code></b><span>Folder yang berisi <code>app</code>, <code>scripts</code>, dan <code>models</code>.</span></li>
+    <li><b>Jalankan perintah berikut</b><span><code class="adm-kode">python scripts/buat_admin.py</code></span></li>
+    <li><b>Isi nama pengguna dan kata sandi</b><span>Kata sandi disimpan dalam bentuk acak (<i>hash</i>) di berkas <code>.env</code>, yang tidak ikut terunggah ke GitHub.</span></li>
+    <li><b>Jalankan ulang aplikasi</b><span>Lalu buka kembali halaman ini.</span></li>
+  </ol>
+</section>
+{% endblock %}

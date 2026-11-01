@@ -1,7 +1,8 @@
 """
 01 - Cek ulang dan pra-pemrosesan dataset soil moisture (Subbab 2.2.1.11)
 =========================================================================
-Masukan : data/raw/Dataset_SoilMoisture_{2023..2026}_with_RH.(xls|csv)
+Masukan : data/raw/SoilMoisture_*.csv (hasil script 09, GAUL 2025)
+          atau data/raw/Dataset_SoilMoisture_{2023..2026}_with_RH.(xls|csv) (dataset lama, GAUL 2015)
 Keluaran: data/processed/dataset_bersih.csv
           reports/01_laporan_data.txt
 
@@ -22,7 +23,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent))
-from config import (AKHIR_LATIH, DATA_PROCESSED, DATA_RAW, FITUR, KEY,
+from config import (AKHIR_DATA, AKHIR_LATIH, DATA_PROCESSED, DATA_RAW, FITUR, KEY,
                     PROV_KE_KELOMPOK, REPORTS, TARGET)
 
 DATA_PROCESSED.mkdir(parents=True, exist_ok=True)
@@ -36,17 +37,31 @@ def tulis(s=""):
 
 
 # ------------------------------------------------------------------ 1. gabung
+# Hasil script 09 (GEE, batas GAUL 2025): data/raw/SoilMoisture_*.csv (misal SoilMoisture_2023_01_sd_2023_12.csv).
+# Jika belum ada, dipakai file lama Dataset_SoilMoisture_{tahun}_with_RH (batas GAUL 2015).
 frames = []
-for th in [2023, 2024, 2025, 2026]:
-    base = DATA_RAW / f"Dataset_SoilMoisture_{th}_with_RH"
-    if base.with_suffix(".csv").exists():
-        f = pd.read_csv(base.with_suffix(".csv"))
-    else:
-        f = pd.read_excel(base.with_suffix(".xls"))  # butuh xlrd (Colab: pip install xlrd)
-    tulis(f"{th}: {len(f):,} baris, {f['ADM2_NAME'].nunique()} kabupaten/kota")
-    frames.append(f)
+baru = sorted(DATA_RAW.glob("SoilMoisture_*.csv"))
+if baru:
+    for f in baru:
+        d = pd.read_csv(f)
+        tulis(f"{f.name}: {len(d):,} baris, {d['ADM2_NAME'].nunique()} kabupaten/kota, "
+              f"{d['tanggal'].nunique()} bulan")
+        frames.append(d)
+else:
+    for th in [2023, 2024, 2025, 2026]:
+        base = DATA_RAW / f"Dataset_SoilMoisture_{th}_with_RH"
+        if base.with_suffix(".csv").exists():
+            f = pd.read_csv(base.with_suffix(".csv"))
+        else:
+            f = pd.read_excel(base.with_suffix(".xls"))  # butuh xlrd (Colab: pip install xlrd)
+        tulis(f"{th}: {len(f):,} baris, {f['ADM2_NAME'].nunique()} kabupaten/kota")
+        frames.append(f)
 df = pd.concat(frames, ignore_index=True)
 df["periode"] = pd.to_datetime(df["tanggal"])
+lewat = df["periode"] > AKHIR_DATA
+if lewat.any():
+    tulis(f"Diabaikan: {lewat.sum():,} baris setelah periode penelitian ({AKHIR_DATA[:7]}).")
+    df = df[~lewat].copy()
 n_wil = df.groupby(KEY).ngroups
 n_bln = df["periode"].nunique()
 tulis(f"\nTotal: {len(df):,} baris = {n_wil} kabupaten/kota x {n_bln} bulan "

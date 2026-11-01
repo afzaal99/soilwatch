@@ -7,17 +7,31 @@ Menjalankan secara lokal:
 lalu buka http://127.0.0.1:5000
 """
 import json
+import secrets
+from datetime import timedelta
 from pathlib import Path
 
 from flask import Flask, Response, abort, jsonify, redirect, render_template, request, url_for
 from markupsafe import Markup
 
+import admin
 import estimasi as est
 import ringkasan as rkn
 
 BASE = Path(__file__).resolve().parent
 app = Flask(__name__)
 app.jinja_env.filters["angka"] = est.fmt
+app.jinja_env.filters["bulan_teks"] = lambda k: est.label_bulan(k) if k else ""
+app.secret_key = admin.baca_env().get("SECRET_KEY") or secrets.token_hex(32)
+app.config.update(MAX_CONTENT_LENGTH=25 * 1024 * 1024, PERMANENT_SESSION_LIFETIME=timedelta(hours=8),
+                  SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE="Lax")
+app.register_blueprint(admin.bp)
+
+
+@app.before_request
+def data_terbaru():
+    """Jika admin baru saja memperbarui data (di proses server mana pun), muat ulang sebelum melayani."""
+    est.cek_versi()
 
 
 def ringkasan():
@@ -192,7 +206,9 @@ def umum():
     return {"penanda_contoh": est.DATA["penanda_contoh"],
             "lapisan_air": est.DATA.get("lapisan_air", 0), "lapisan_gambut": est.DATA.get("lapisan_gambut", 0),
             "sumber_kepentingan": est.DATA.get("sumber_kepentingan", "contoh"),
-            "konf": est.KONF or {}}
+            "konf": est.KONF or {},
+            "rentang_data": f'{est.DATA["periode_label"][0]} – {est.DATA["periode_label"][-1]}',
+            "jumlah_wilayah": len(est.WILAYAH)}
 
 
 if __name__ == "__main__":

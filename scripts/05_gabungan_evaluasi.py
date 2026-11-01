@@ -5,7 +5,7 @@
 
 Masukan : hasil script 03 dan 04 (reports/03_*, reports/04_*)
           data/geo/penanda_lahan_kabkota.csv (hasil script 02, opsional)
-          data/geo/badan_air_besar.geojson + batas_kabkota_gaul2015.geojson (hasil script 02, opsional)
+          data/geo/badan_air_besar.geojson + batas_kabkota_gaul2025.geojson (hasil script 02, opsional)
 Keluaran: reports/05_bobot_gabungan_cv.csv     RMSE validasi untuk 11 bobot, per cakupan model
           reports/05_evaluasi_semua.csv        R2, MAE, RMSE data uji: 3 pendekatan x nasional/regional
                                                x (Indonesia, 7 kelompok, wilayah danau, wilayah gambut)

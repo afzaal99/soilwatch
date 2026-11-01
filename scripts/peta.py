@@ -2,8 +2,8 @@
 Fungsi bersama untuk daftar wilayah dan peta SVG (dipakai script 07 dan 08).
 
 Sumber batas wilayah:
-1. data/geo/batas_kabkota_gaul2015.geojson (hasil script 02 / GEE) -> dipakai jika ada.
-   Batas FAO GAUL 2015 sama dengan dataset, sehingga 442 wilayah dicocokkan 1:1
+1. data/geo/batas_kabkota_gaul2025.geojson (hasil script 02 / GEE) -> dipakai jika ada.
+   Batas FAO GAUL 2025 sama dengan dataset, sehingga 514 wilayah dicocokkan 1:1
    berdasarkan ADM2_NAME + ADM1_NAME.
 2. Jika belum ada: data/geo/batas_pratinjau_gadm.json (GADM lama, 394 poligon), dicocokkan
    lewat nama yang dinormalkan. Hanya untuk pratinjau.
@@ -16,16 +16,11 @@ import pandas as pd
 
 from config import ROOT
 
-GEO_GAUL = ROOT / "data" / "geo" / "batas_kabkota_gaul2015.geojson"
+GEO_GAUL = ROOT / "data" / "geo" / "batas_kabkota_gaul2025.geojson"
 GEO_GADM = ROOT / "data" / "geo" / "batas_pratinjau_gadm.json"
 LON0, LON1, LAT0, LAT1 = 94.8, 141.2, -11.2, 6.3
 
-NAMA_PROV = {
-    "Nangroe Aceh Darussalam": "Aceh", "Kepulauan-riau": "Kepulauan Riau",
-    "Dki Jakarta": "DKI Jakarta", "Daerah Istimewa Yogyakarta": "DI Yogyakarta",
-    "Nusatenggara Barat": "Nusa Tenggara Barat", "Nusatenggara Timur": "Nusa Tenggara Timur",
-    "Bangka Belitung": "Kepulauan Bangka Belitung",
-}
+NAMA_PROV = {"Dki Jakarta": "DKI Jakarta", "Daerah Istimewa Yogyakarta": "DI Yogyakarta"}  # nama tampilan
 ALIAS = {"bulongan": "bulungan", "yapenwaropen": "yapen", "makassar": "makasar",
          "kepulauansangihetalaud": "kepulauansangihe", "bukittinggi": "bukitinggi",
          "adminkepulauanseribu": "jakartautara"}
@@ -34,11 +29,14 @@ BULAN = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustu
 
 
 def is_kota(nama):
-    return nama.startswith("Kota ") and nama != "Kota Baru"   # Kota Baru = Kab. Kotabaru
+    return nama.startswith("Kota ") and nama != "Kota Baru"   # Kota Baru = Kab. Kotabaru (Kalimantan Selatan)
+
+
+LABEL_KHUSUS = {"Kota Baru": "Kab. Kotabaru", "Kepulauan Seribu": "Kab. Adm. Kepulauan Seribu"}
 
 
 def label(nama):
-    return nama if is_kota(nama) else ("Kab. Kotabaru" if nama == "Kota Baru" else f"Kab. {nama}")
+    return LABEL_KHUSUS.get(nama) or (nama if is_kota(nama) else f"Kab. {nama}")
 
 
 def norm(s):
@@ -86,7 +84,7 @@ def poligon_wilayah(wil):
         for f in geo["features"]:
             p = f.get("properties") or {}
             hasil.append((idx.get((p.get("ADM2_NAME"), p.get("ADM1_NAME"))), _cincin(f.get("geometry"))))
-        return "GAUL 2015", hasil
+        return "GAUL 2025", hasil
 
     kunci = {}
     for nm, i in zip(wil["ADM2_NAME"], wil["id"]):

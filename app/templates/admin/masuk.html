@@ -1,0 +1,28 @@
+{% extends "admin/_dasar.html" %}
+{% block judul %}Masuk{% endblock %}
+{% block isi %}
+<section class="card adm-masuk">
+  <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="" width="44" height="44">
+  <h1>Masuk Admin</h1>
+  <p class="muted">Halaman ini khusus pengelola data SoilWatch ID.</p>
+  {% if tunggu %}
+  <div class="alert bad small">Terlalu banyak percobaan gagal. Coba lagi dalam {{ (tunggu / 60) | round(0, 'ceil') | int }} menit.</div>
+  {% endif %}
+  <form method="post" class="adm-form" autocomplete="on">
+    <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+    <div class="field">
+      <label for="nama">Nama pengguna</label>
+      <div class="inp"><input id="nama" name="nama" required autocomplete="username" autofocus></div>
+    </div>
+    <div class="field">
+      <label for="sandi">Kata sandi</label>
+      <div class="inp">
+        <input id="sandi" name="sandi" type="password" required autocomplete="current-password">
+        <button type="button" class="adm-lihat" aria-label="Tampilkan kata sandi" aria-pressed="false"
+                onclick="const i=document.getElementById('sandi');const t=i.type==='password';i.type=t?'text':'password';this.setAttribute('aria-pressed',t);this.textContent=t?'Sembunyikan':'Tampilkan';">Tampilkan</button>
+      </div>
+    </div>
+    <button class="btn p wide" type="submit" {{ 'disabled' if tunggu }}>Masuk</button>
+  </form>
+</section>
+{% endblock %}

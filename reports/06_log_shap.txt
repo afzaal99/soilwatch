@@ -1,39 +1,39 @@
 Model terbaik: XGBoost
-SHAP dihitung pada 3,978 baris data uji (dari 3,978)
-  Jawa                 XGB bobot 1.0: 1044 baris, 1 s
-  Papua                XGB bobot 1.0: 261 baris, 0 s
-  nasional             XGB bobot 1.0: 2673 baris, 2 s
-Pemeriksaan aditif: |nilai dasar + jumlah SHAP - prediksi| maks = 1.20e-06
+SHAP dihitung pada 1,002 baris data uji (dari 4,626)
+  Jawa                 XGB bobot 1.0: 232 baris, 1 s
+  Papua                XGB bobot 1.0: 82 baris, 0 s
+  nasional             XGB bobot 1.0: 688 baris, 1 s
+Pemeriksaan aditif: |nilai dasar + jumlah SHAP - prediksi| maks = 1.02e-06
 
 Global Feature Importance (rata-rata |SHAP| pada data uji):
  peringkat              label  mean_abs_shap  persen
-         1  Kemiringan lereng         0.0252 19.6266
-         2 Kelembapan relatif         0.0166 12.8753
-         3        Curah hujan         0.0150 11.6470
-         4            Elevasi         0.0144 11.1935
-         5     Kandungan liat         0.0140 10.8564
-         6         Suhu tanah         0.0117  9.1023
-         7                LST         0.0084  6.5066
-         8   Radiasi matahari         0.0072  5.6000
-         9    Kecepatan angin         0.0056  4.3780
-        10               NDVI         0.0050  3.8882
-        11         Suhu udara         0.0031  2.4040
-        12   Suhu titik embun         0.0025  1.9220
+         1  Kemiringan lereng         0.0250 19.2793
+         2 Kelembapan relatif         0.0167 12.8594
+         3            Elevasi         0.0151 11.6203
+         4        Curah hujan         0.0142 10.9297
+         5         Suhu tanah         0.0141 10.8738
+         6     Kandungan liat         0.0134 10.3578
+         7                LST         0.0075  5.7800
+         8   Radiasi matahari         0.0063  4.8442
+         9               NDVI         0.0053  4.0833
+        10    Kecepatan angin         0.0051  3.9251
+        11         Suhu udara         0.0040  3.0564
+        12   Suhu titik embun         0.0031  2.3908
 
 Pemeriksaan pola (arah hubungan pada data asli vs arah pengaruh menurut SHAP):
           variabel  spearman_data_vs_target  spearman_nilai_vs_shap arah_sama
-       Curah hujan                    0.400                   0.815      True
-        Suhu udara                   -0.102                   0.177     False
-  Suhu titik embun                    0.067                   0.355     lemah
-              NDVI                   -0.139                   0.746     False
-               LST                   -0.026                  -0.599     lemah
-           Elevasi                   -0.059                  -0.247     lemah
- Kemiringan lereng                   -0.136                  -0.751      True
-  Radiasi matahari                   -0.353                  -0.678      True
-   Kecepatan angin                   -0.177                  -0.619      True
-    Kandungan liat                   -0.015                  -0.074     lemah
-        Suhu tanah                   -0.105                  -0.841      True
-Kelembapan relatif                    0.330                   0.855      True
+       Curah hujan                    0.357                   0.836      True
+        Suhu udara                    0.048                   0.523     lemah
+  Suhu titik embun                    0.207                   0.388      True
+              NDVI                   -0.218                   0.753     False
+               LST                    0.062                  -0.449     lemah
+           Elevasi                   -0.206                  -0.360      True
+ Kemiringan lereng                   -0.287                  -0.775      True
+  Radiasi matahari                   -0.299                  -0.599      True
+   Kecepatan angin                   -0.119                  -0.508      True
+    Kandungan liat                    0.008                   0.022     lemah
+        Suhu tanah                    0.046                  -0.810     lemah
+Kelembapan relatif                    0.239                   0.832      True
 Grafik disimpan: 06_shap_global_bar.png, 06_shap_beeswarm.png, 06_shap_lokal_contoh.png
 
-Selesai dalam 13 s
+Selesai dalam 10 s

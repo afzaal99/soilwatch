@@ -1,7 +1,7 @@
 """
 02 - Ekstraksi penanda lahan dari Google Earth Engine (Subbab 2.2.1.8)  [jalankan di Google Colab]
 =================================================================================================
-Menghitung, untuk setiap kabupaten/kota (batas FAO GAUL 2015 level 2, sama dengan dataset utama):
+Menghitung, untuk setiap kabupaten/kota (batas FAO GAUL 2025 level 2, 514 wilayah, sama dengan dataset utama):
   - prop_badan_air  : proporsi luas badan air darat (kelas 80 "Permanent water bodies" ESA WorldCover
                       v200, 10 m), TANPA laut
   - prop_pertanian  : proporsi luas kelas 40 "Cropland" ESA WorldCover
@@ -20,7 +20,7 @@ SETELAH script ini dijalankan ulang, jalankan lagi script 02b (CSV penanda terti
 
 Hasil diekspor ke Google Drive (folder "skripsi_gee"), semuanya ditaruh di soilwatch/data/geo/:
   1. penanda_lahan_kabkota.csv         proporsi lahan per kabupaten/kota
-  2. batas_kabkota_gaul2015.geojson    batas 442 kabupaten/kota untuk peta web
+  2. batas_kabkota_gaul2025.geojson    batas 514 kabupaten/kota untuk peta web
   3. badan_air_besar.geojson           bentuk badan air darat >= LUAS_MIN_AIR km2 (danau, waduk)
   4. sebaran_gambut.geojson            bentuk sebaran gambut >= LUAS_MIN_GAMBUT km2 (hanya jika ASET_GAMBUT diisi)
 
@@ -52,10 +52,12 @@ ee.Initialize(project=PROJECT_ID)
 INDONESIA = ee.Geometry.Rectangle([94.5, -11.5, 141.5, 6.5], None, False)
 
 # ----------------------------------------------------------------- batas wilayah
-kabkota = (ee.FeatureCollection("FAO/GAUL/2015/level2")
-           .filter(ee.Filter.eq("ADM0_NAME", "Indonesia"))
-           .select(["ADM1_NAME", "ADM2_NAME", "ADM2_CODE"]))
-print("Jumlah kabupaten/kota GAUL 2015:", kabkota.size().getInfo())  # harus 442
+# FAO GAUL 2025: nama kolom huruf besar (GAUL1_NAME, GAUL2_NAME), diganti ke nama yang dipakai
+# seluruh script (ADM1_NAME, ADM2_NAME, ADM2_CODE)
+kabkota = (ee.FeatureCollection("FAO/GAUL/2025/level2")
+           .filter(ee.Filter.eq("GAUL0_NAME", "Indonesia"))
+           .select(["GAUL1_NAME", "GAUL2_NAME", "GAUL2_CODE"], ["ADM1_NAME", "ADM2_NAME", "ADM2_CODE"]))
+print("Jumlah kabupaten/kota GAUL 2025:", kabkota.size().getInfo())  # harus 514
 
 # ----------------------------------------------------------------- ESA WorldCover
 wc = ee.ImageCollection("ESA/WorldCover/v200").first().select("Map")
@@ -113,10 +115,18 @@ tugas = [ee.batch.Export.table.toDrive(
     fileNamePrefix="penanda_lahan_kabkota", fileFormat="CSV", selectors=kolom)]
 
 # ----------------------------------------------------------------- 2. batas untuk peta web
-batas_web = kabkota.map(lambda f: f.setGeometry(f.geometry().simplify(maxError=500)))
+# Batas disederhanakan (toleransi 500 m) agar file peta web ringan. Wilayah kecil (< 200 km2, mis. kota
+# pesisir seperti Kota Sibolga) memakai toleransi 50 m supaya bentuknya tidak hilang saat disederhanakan.
+def sederhanakan(f):
+    g = f.geometry()
+    return f.setGeometry(ee.Geometry(ee.Algorithms.If(
+        g.area(maxError=10).lt(2e8), g.simplify(maxError=50), g.simplify(maxError=500))))
+
+
+batas_web = kabkota.map(sederhanakan)
 tugas.append(ee.batch.Export.table.toDrive(
-    collection=batas_web, description="batas_kabkota_gaul2015", folder=FOLDER_DRIVE,
-    fileNamePrefix="batas_kabkota_gaul2015", fileFormat="GeoJSON"))
+    collection=batas_web, description="batas_kabkota_gaul2025", folder=FOLDER_DRIVE,
+    fileNamePrefix="batas_kabkota_gaul2025", fileFormat="GeoJSON"))
 
 
 # ----------------------------------------------------------------- 3 & 4. bentuk asli untuk peta web
