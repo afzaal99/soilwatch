@@ -142,7 +142,9 @@ def tulis_db(wil, penanda, contoh, periode, df, meta, danau_w):
     con.executemany("INSERT INTO periode VALUES (?,?,?)",
                     [(i, pd.Timestamp(p).strftime("%Y-%m"), label_periode(p)) for i, p in enumerate(periode)])
     pid = {p: i for i, p in enumerate(periode)}
-    baris = [(int(a), pid[p], *(r(v) for v in vals))
+    # nilai disimpan tanpa pembulatan: model (terutama XGBoost) memakai batas split yang persis sama dengan
+    # nilai data latih, sehingga pembulatan 4 desimal bisa menggeser estimasi sebagian wilayah
+    baris = [(int(a), pid[p], *(None if pd.isna(v) else float(v) for v in vals))
              for a, p, *vals in df[["id", "periode", TARGET] + FITUR].itertuples(index=False)]
     con.executemany(f"INSERT INTO data_bulanan VALUES ({','.join('?' * (3 + len(FITUR)))})", baris)
     meta["penanda_contoh"] = contoh

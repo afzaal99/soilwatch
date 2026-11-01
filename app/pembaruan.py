@@ -523,7 +523,8 @@ def simpan(token, timpa=False):
                     con.execute("INSERT INTO periode VALUES (?,?,?)", (pid, k, label(k)))
                     kode_ke_id[k] = pid
             sub = df[df["kode"].isin(tulis)]
-            baris = [(int(r.id), kode_ke_id[r.kode], *(None if pd.isna(getattr(r, c)) else round(float(getattr(r, c)), 4)
+            # tanpa pembulatan, sama seperti script 08 (lihat catatan di sana)
+            baris = [(int(r.id), kode_ke_id[r.kode], *(None if pd.isna(getattr(r, c)) else float(getattr(r, c))
                                                         for c in [TARGET] + fitur))
                      for r in sub.itertuples(index=False)]
             con.executemany(f"INSERT OR REPLACE INTO data_bulanan (wilayah_id, periode_id, {TARGET}, "
