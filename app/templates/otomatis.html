@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% from "_langkah.html" import langkah %}
+{% block title %}Mode Otomatis · SoilWatch ID{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="p-title">Mode Otomatis</h1>
+    <p class="muted">Klik kabupaten/kota pada peta untuk melihat estimasinya.</p>
+  </div>
+  {{ langkah(2, 'Pilih wilayah') }}
+</div>
+
+<div class="oto" data-pilih-id="{{ pilih_id }}" data-pilih-periode="{{ pilih_periode }}"
+     data-sumber="{{ url_for('api_peta') }}" data-hasil="{{ url_for('hasil') }}">
+  <section class="card oto-map">
+    <div class="toolbar">
+      <div class="search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+        <input id="cari" type="search" placeholder="Cari kabupaten/kota..." autocomplete="off" aria-label="Cari kabupaten/kota"
+               role="combobox" aria-expanded="false" aria-controls="saran">
+        <ul id="saran" class="saran" role="listbox" hidden></ul>
+      </div>
+      <label class="sel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+        <select id="bulan" aria-label="Bulan">
+          {% for b in ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'] %}
+          <option value="{{ '%02d' % loop.index }}">{{ b }}</option>{% endfor %}
+        </select></label>
+      <label class="sel"><select id="tahun" aria-label="Tahun">
+          {% for t in tahun %}<option>{{ t }}</option>{% endfor %}
+        </select></label>
+      <span class="grow"></span>
+      <label class="tog"><input type="checkbox" id="t-gambut" checked><span class="sw"></span>Lahan gambut</label>
+      <label class="tog"><input type="checkbox" id="t-air" checked><span class="sw"></span>Badan air</label>
+    </div>
+
+    <div class="map-box" id="mapbox">
+      {{ peta }}
+      <div class="zoom">
+        <button type="button" id="zin" aria-label="Perbesar">+</button>
+        <button type="button" id="zout" aria-label="Perkecil">−</button>
+        <button type="button" id="zpenuh" aria-label="Layar penuh" title="Layar penuh">
+          <svg class="ik-buka" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>
+          <svg class="ik-tutup" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        <button type="button" id="zreset" aria-label="Kembalikan tampilan" title="Kembalikan tampilan">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 9V4h5M20 15v5h-5M4 4l6 6M20 20l-6-6"/></svg></button>
+      </div>
+      <div class="tip" id="tip" hidden></div>
+      <div class="legend-box">
+        <div class="legend-title">Soil moisture (m³/m³)</div>
+        <div class="legend-lbl"><span>Kering</span><span>Basah</span></div>
+        <div class="legend-ramp"></div>
+        <div class="legend-tick"><span>0,10</span><span>0,20</span><span>0,30</span><span>0,40</span><span>0,50</span></div>
+        <div class="legend-sym">
+          {% if lapisan_gambut %}<span><i class="sym-arsir"></i>Sebaran gambut</span>
+          {% else %}<span><i class="sym-arsir"></i>Gambut ≥ 20%</span>{% endif %}
+          {% if lapisan_air %}<span><i class="sym-danau"></i>Danau/waduk besar</span>
+          {% else %}<span><svg width="11" height="14" viewBox="0 0 12 16" aria-hidden="true"><path d="M6 0C6 0 0 7 0 10.5A6 6 0 0 0 12 10.5C12 7 6 0 6 0z" fill="#1D4ED8"/></svg>Badan air ≥ 20%</span>{% endif %}
+        </div>
+      </div>
+    </div>
+    {% if penanda_contoh %}<p class="note-contoh">Penanda lahan gambut dan badan air masih <b>nilai contoh</b>, menunggu hasil ekstraksi GEE.</p>{% endif %}
+  </section>
+
+  <aside class="card oto-side" id="panel" aria-live="polite">
+    <div id="kosong" class="side-empty">
+      <div class="empty-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></div>
+      <h2>Belum ada wilayah terpilih</h2>
+      <p class="muted">Klik salah satu kabupaten/kota pada peta, atau ketik namanya di kolom pencarian.</p>
+    </div>
+    <div id="isi" hidden>
+      <div class="muted small-2">Wilayah terpilih</div>
+      <h2 class="w-nama" id="w-nama"></h2>
+      <div class="muted" id="w-prov"></div>
+      <div class="chips">
+        <span class="chip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span id="w-per"></span></span>
+        <span class="chip ok" id="w-status">Data tersedia</span>
+      </div>
+      <hr>
+      <h3 class="side-h">Karakteristik wilayah</h3>
+      <div class="bar-row"><span><i class="sym-arsir"></i>Lahan gambut</span><b id="v-gambut"></b></div>
+      <div class="bar"><i id="b-gambut" class="b-gambut"></i></div>
+      <div class="bar-row"><span><svg width="12" height="15" viewBox="0 0 12 16" aria-hidden="true"><path d="M6 0C6 0 0 7 0 10.5A6 6 0 0 0 12 10.5C12 7 6 0 6 0z" fill="#1D4ED8"/></svg>Badan air</span><b id="v-air"></b></div>
+      <div class="bar"><i id="b-air" class="b-air"></i></div>
+      <div class="bar-row"><span><i class="sym-tani"></i>Lahan pertanian</span><b id="v-tani"></b></div>
+      <div class="bar"><i id="b-tani" class="b-tani"></i></div>
+      <div class="note" id="w-catatan"></div>
+      <div class="side-foot">
+        <a class="btn p wide" id="ke-hasil" href="#">Lihat Hasil Estimasi
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <p class="muted center small-2">Klik wilayah lain pada peta untuk mengganti pilihan</p>
+      </div>
+    </div>
+  </aside>
+</div>
+<section class="card pk-oto" id="pk-oto" hidden aria-labelledby="judul-pk-oto">
+  <div class="card-h wrap">
+    <div><h2 id="judul-pk-oto">Wilayah yang perlu diperhatikan</h2>
+      <p class="muted small-2"><span id="pk-oto-per"></span> · lima kabupaten/kota dengan <i>soil moisture</i> terendah dan tertinggi (nilai acuan SMAP L4). Klik untuk memilihnya di peta.</p></div>
+  </div>
+  <div class="pk-oto-grid">
+    <div><div class="pk-oto-h kering">Paling kering</div><ol class="pk-oto-list" id="pk-kering"></ol></div>
+    <div><div class="pk-oto-h basah">Paling basah</div><ol class="pk-oto-list" id="pk-basah"></ol></div>
+  </div>
+</section>
+<script src="{{ url_for('static', filename='js/otomatis.js') }}"></script>
+{% endblock %}

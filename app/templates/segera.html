@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ judul }} · SoilWatch ID{% endblock %}
+{% block content %}
+<section class="card soon">
+  <h1 class="h-title">{{ judul }}</h1>
+  <p class="muted">{{ pesan }}</p>
+  <a class="btn s" href="{{ url_for('beranda') }}">Kembali ke Beranda</a>
+</section>
+{% endblock %}

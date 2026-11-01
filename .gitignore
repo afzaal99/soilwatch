@@ -1,0 +1,39 @@
+# ===== SoilWatch ID: file yang TIDAK ikut ke GitHub =====
+
+# Lingkungan Python (bisa dibuat ulang dengan pip install)
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Rahasia / pengaturan pribadi (nanti dipakai untuk password admin)
+.env
+*.env
+instance/
+
+# Data mentah dan hasil antara (besar, bisa dibuat ulang dari script)
+data/raw/
+data/processed/
+reports/*.csv
+
+# Bawaan sistem dan editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Cadangan dan arsip
+*.zip
+*.bak
+*backup*/
+*_lama*/
+
+# CATATAN: yang SENGAJA tetap ikut karena aplikasi butuh untuk jalan:
+#   app/data/soilwatch.db, models/, data/geo/, app/static/
+
+# Model Random Forest nasional (107 MB, melebihi batas GitHub 100 MB).
+# Tidak dipakai aplikasi karena bobot RF = 0 (model terpilih XGBoost). Cadangan disimpan di Google Drive.
+models/rf_nasional.joblib

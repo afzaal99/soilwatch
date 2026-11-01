@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}SoilWatch ID{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='img/logo.svg') }}" type="image/svg+xml">
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="logo" href="{{ url_for('beranda') }}">
+        <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="" width="32" height="32">
+        <span>SoilWatch <b>ID</b></span>
+      </a>
+      <nav class="links" aria-label="Menu utama">
+        <a href="{{ url_for('beranda') }}" class="{{ 'on' if menu == 'beranda' }}">Beranda</a>
+        <a href="{{ url_for('prediksi') }}" class="{{ 'on' if menu == 'prediksi' }}">Prediksi</a>
+        <a href="{{ url_for('informasi') }}" class="{{ 'on' if menu == 'informasi' }}">Informasi</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="footer">
+    Sumber data: SMAP Level 4 · CHIRPS · ERA5-Land · MODIS · SRTM · OpenLandMap · ESA WorldCover · Peta Lahan Gambut Kementan · FAO GAUL
+  </footer>
+</body>
+</html>

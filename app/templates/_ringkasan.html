@@ -1,0 +1,38 @@
+{# Potongan tampilan ringkasan kondisi soil moisture: dipakai di Beranda dan halaman hasil. #}
+
+{% macro kesimpulan(rk) %}
+<ul class="rk-poin">
+  {% for k in rk.kalimat %}<li>{{ k | safe }}</li>{% endfor %}
+</ul>
+{% endmacro %}
+
+{% macro tahunan(rk) %}
+<div class="rk-tahun" role="list" aria-label="Rata-rata per tahun" style="--n: {{ rk.tahunan | length }}">
+  {% for t in rk.tahunan %}
+  <div class="rk-th" role="listitem">
+    <span>{{ t.tahun }}{% if t.ket %} <small>({{ t.ket }})</small>{% endif %}</span>
+    <b>{{ t.rata | angka(2) }}</b>
+  </div>
+  {% endfor %}
+</div>
+{% endmacro %}
+
+{% macro pola(rk) %}
+{% set g = rk.grafik_pola %}
+<div class="trend-gulir pola-gulir"><svg class="rk-pola" viewBox="0 0 {{ g.W }} {{ g.H }}" role="img" aria-label="Rata-rata soil moisture tiap bulan">
+  {% for y in g.gy %}<line x1="{{ g.L }}" x2="{{ g.W - g.R }}" y1="{{ y.y }}" y2="{{ y.y }}" class="gl"/><text x="{{ g.L - 8 }}" y="{{ y.y + 4 }}" text-anchor="end">{{ y.teks }}</text>{% endfor %}
+  {% for b in g.batang %}
+  <rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" rx="3" class="bt {{ b.jenis }}"><title>{{ b.bulan }}: {{ b.teks }} m³/m³</title></rect>
+  <text x="{{ b.cx }}" y="{{ g.H - 8 }}" text-anchor="middle">{{ b.bulan }}</text>
+  {% endfor %}
+</svg></div>
+{% endmacro %}
+
+{% macro sumbu_bulan(g) %}
+{% for c in g.centang %}<line x1="{{ c.x }}" x2="{{ c.x }}" y1="{{ g.H - g.B }}" y2="{{ g.H - g.B + (6 if c.besar else 3) }}" class="ax{{ ' ax-th' if c.besar }}"/>{% endfor %}
+{% for x in g.gx %}<text x="{{ x.x }}" y="{{ g.H - 8 }}" text-anchor="middle" class="{{ 'lbl-th' if x.tahun else 'lbl-bl' }}">{{ x.teks }}</text>{% endfor %}
+{% endmacro %}
+
+{% macro titik_tooltip(g) %}
+<g class="hit">{% for t in g.titik_bulan %}<circle cx="{{ t.x }}" cy="{{ t.y }}" r="9" data-tip="{{ t.teks }}"><title>{{ t.teks }}</title></circle>{% endfor %}</g>
+{% endmacro %}

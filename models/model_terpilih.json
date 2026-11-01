@@ -1,0 +1,49 @@
+{
+ "pendekatan": "XGBoost",
+ "bobot_rf": {
+  "Bali-Nusa Tenggara": 0.0,
+  "Jawa": 0.0,
+  "Kalimantan": 0.0,
+  "Maluku": 0.0,
+  "Papua": 0.0,
+  "Sulawesi": 0.0,
+  "Sumatera": 0.0,
+  "nasional": 0.0
+ },
+ "per_kelompok": {
+  "Sumatera": "nasional",
+  "Jawa": "regional",
+  "Bali-Nusa Tenggara": "nasional",
+  "Kalimantan": "nasional",
+  "Sulawesi": "nasional",
+  "Maluku": "nasional",
+  "Papua": "regional"
+ },
+ "keterangan": "prediksi = bobot_rf x RF + (1 - bobot_rf) x XGBoost; per_kelompok memilih model nasional atau regional (aturan 10% RMSE). Mode Simulasi memakai model nasional.",
+ "metrik_uji_indonesia": {
+  "R2": 0.8387,
+  "MAE": 0.0255,
+  "RMSE": 0.0354
+ },
+ "metrik_uji_wilayah_khusus": {
+  "Wilayah danau": {
+   "R2": 0.7935,
+   "MAE": 0.0191,
+   "RMSE": 0.025,
+   "n": 351.0
+  },
+  "Wilayah gambut (>=20%)": {
+   "R2": 0.2012,
+   "MAE": 0.0593,
+   "RMSE": 0.0771,
+   "n": 180.0
+  },
+  "Wilayah lainnya": {
+   "R2": 0.8545,
+   "MAE": 0.0244,
+   "RMSE": 0.0327,
+   "n": 3456.0
+  }
+ },
+ "dibuat": "2026-10-31T17:32:15"
+}

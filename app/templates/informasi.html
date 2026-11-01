@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% block title %}Informasi · SoilWatch ID{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="p-title">Informasi</h1>
+    <p class="muted">Panduan singkat, sumber data, dan batasan aplikasi.</p>
+  </div>
+</div>
+
+<div class="info">
+  <nav class="card info-nav" aria-label="Isi halaman">
+    <button type="button" class="info-menu" aria-expanded="false" aria-controls="info-tautan">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <span>Isi halaman</span><b id="info-aktif">Tentang aplikasi</b></button>
+    <div class="info-tautan" id="info-tautan">
+    <a href="#tentang" class="on">Tentang aplikasi</a>
+    <a href="#cara">Cara menggunakan</a>
+    <a href="#data">Data dan metode</a>
+    <a href="#teknologi">Teknologi</a>
+    <a href="#akurasi">Akurasi model</a>
+    <a href="#batasan">Batasan</a>
+    <a href="#faq">Pertanyaan umum</a>
+    <a href="#pengembang">Pengembang</a>
+    </div>
+  </nav>
+
+  <div class="info-cols">
+    <div class="info-stack">
+      <section class="card info-card" id="tentang">
+      <h2>Tentang aplikasi</h2>
+      <p>SoilWatch ID adalah aplikasi pemantauan kelembapan tanah (<i>soil moisture</i>) bulanan untuk 442 kabupaten/kota
+        di Indonesia. Aplikasi ini ditujukan bagi staf dinas pertanian kabupaten/kota dan penyuluh pertanian sebagai
+        bahan pertimbangan awal dalam memantau potensi kekeringan, dengan menyajikan estimasi berbasis data penginderaan
+        jauh beserta penjelasan faktor yang memengaruhinya.</p>
+      <h3 id="cara">Cara menggunakan</h3>
+      <ol class="how">
+        <li><b>Pilih mode</b><span>Mode Otomatis untuk kondisi wilayah, Mode Simulasi untuk skenario.</span></li>
+        <li><b>Pilih wilayah atau isi data</b><span>Klik kabupaten/kota pada peta, atau masukkan nilai variabel.</span></li>
+        <li><b>Baca hasil dan penjelasannya</b><span>Lihat nilai estimasi, faktor penyebab (SHAP), dan tren wilayah.</span></li>
+      </ol>
+      <p class="muted small-2">Ringkasan kondisi nasional dan daftar wilayah dengan nilai terendah dan tertinggi tersedia di Beranda.
+        Data dapat diunduh dalam format CSV, dan halaman hasil dapat dicetak atau disimpan sebagai PDF.</p>
+    </section>
+      <section class="card info-card" id="faq">
+      <h2>Pertanyaan umum</h2>
+      <details>
+        <summary>Apa itu <i>soil moisture</i> dan satuannya?</summary>
+        <p><i>Soil moisture</i> adalah banyaknya air yang terkandung di dalam tanah. Satuannya m³/m³, yaitu volume air
+          per volume tanah. Nilai 0,30 berarti sekitar 30% volume tanah berisi air.</p>
+      </details>
+      <details>
+        <summary>Apa beda Mode Otomatis dan Mode Simulasi?</summary>
+        <p>Mode Otomatis memakai nilai variabel lingkungan yang tercatat untuk wilayah dan bulan yang dipilih. Mode
+          Simulasi memakai nilai yang Anda masukkan sendiri, sehingga hasilnya merupakan skenario hipotetis.</p>
+      </details>
+      <details>
+        <summary>Bagaimana membaca grafik SHAP?</summary>
+        <p>Grafik dimulai dari rata-rata keluaran model. Batang hijau menunjukkan variabel yang menaikkan estimasi,
+          batang merah menunjukkan variabel yang menurunkannya. Jumlah semua kontribusi ditambah rata-rata model sama
+          dengan nilai estimasi.</p>
+      </details>
+      <details>
+        <summary>Apa arti warna, arsiran, dan warna biru pada peta?</summary>
+        <p>Warna wilayah menunjukkan nilai <i>soil moisture</i> SMAP L4 pada bulan terpilih: cokelat untuk nilai rendah
+          (kering) dan hijau kebiruan untuk nilai tinggi (basah), dengan 8 kelas selebar 0,05 m³/m³ dari 0,10 sampai 0,50.
+          {% if lapisan_gambut %}Arsiran menunjukkan sebaran lahan gambut sesuai peta gambut Kementan.{% else %}Arsiran menandai kabupaten/kota dengan lahan gambut minimal 20% dari luas wilayahnya.{% endif %}
+          {% if lapisan_air %}Warna biru menunjukkan danau dan waduk besar (luas minimal 25 km²) sesuai bentuk aslinya; arahkan kursor untuk melihat namanya. Sungai, tambak, dan badan air kecil tidak digambar, tetapi tetap dihitung dalam proporsi badan air wilayah.{% else %}Ikon air menandai wilayah dengan badan air minimal 20%.{% endif %}</p>
+      </details>
+      <details>
+        <summary>Apa arti "di bawah" atau "di atas rata-rata" pada ringkasan kondisi?</summary>
+        <p>Nilai suatu bulan dibandingkan dengan rata-rata bulan yang sama pada tahun-tahun lain yang tersedia.
+          Contoh: "0,02 m³/m³ di bawah rata-rata Juni 2023–2025" berarti nilai Juni tahun ini lebih rendah 0,02 m³/m³
+          dibanding rata-rata bulan Juni tahun 2023, 2024, dan 2025. Selisih kurang dari 0,01 m³/m³ disebut setara.
+          Ringkasan dihitung dari nilai acuan SMAP L4, bukan dari hasil prediksi model.</p>
+      </details>
+      <details>
+        <summary>Mengapa ada peringatan pada wilayah gambut?</summary>
+        <p>Kelembapan tanah gambut lebih banyak dipengaruhi muka air tanah dan drainase, yang tidak tercakup dalam
+          variabel model, sehingga estimasi di wilayah gambut kurang akurat dibanding wilayah lain. Untuk wilayah dengan
+          gambut minimal 20%, halaman hasil menampilkan rentang perkiraan berdasarkan galat model pada data uji.</p>
+      </details>
+      <details>
+        <summary>Bagaimana mengunduh data?</summary>
+        <p>Di Beranda, bagian "Unduh data (CSV)" menyediakan rata-rata nasional per bulan, data bulanan seluruh
+          kabupaten/kota (semua tahun atau tahun tertentu), dan rata-rata tahunan seluruh kabupaten/kota. Di halaman hasil,
+          tombol "Unduh CSV" menyediakan data bulanan wilayah tersebut: nilai SMAP, estimasi model, dan 12 variabel
+          lingkungan. Berkas menggunakan pemisah titik koma dan desimal koma sehingga dapat langsung dibuka di Excel.</p>
+      </details>
+    </section>
+      <section class="card info-card" id="akurasi">
+        <h2>Akurasi model</h2>
+        {% set m = konf.get('metrik_uji_indonesia') %}
+        {% if m %}
+        <div class="note ok akurasi-ringkas">Secara rata-rata, estimasi berselisih sekitar <b>±{{ m.MAE | angka(3) }} m³/m³</b>
+          dari nilai acuan SMAP L4.{% for n, d in (konf.get('metrik_uji_wilayah_khusus') or {}).items() if n.startswith('Wilayah gambut') %}
+          Di wilayah gambut, selisihnya lebih besar, sekitar <b>±{{ d.MAE | angka(3) }} m³/m³</b>, sehingga hasil di wilayah tersebut perlu ditafsirkan dengan hati-hati.{% endfor %}</div>
+        <p>Model yang digunakan: <b>{{ konf.get('pendekatan', '-') }}</b>{% set reg = (konf.get('per_kelompok') or {}).items() | selectattr(1, 'equalto', 'regional') | map(attribute=0) | list %}{% if reg %}, dengan model regional untuk {{ reg | join(' dan ') }} dan model nasional untuk wilayah lainnya{% endif %}.
+          Pengujian dilakukan pada data Oktober 2025 – Juni 2026 yang tidak digunakan dalam pelatihan model.</p>
+        <table class="src">
+          <tr><th>Cakupan</th><th>R²</th><th>MAE (m³/m³)</th></tr>
+          <tr><td>Seluruh Indonesia</td><td>{{ m.R2 | angka(2) }}</td><td>{{ m.MAE | angka(3) }}</td></tr>
+          {% for n, d in (konf.get('metrik_uji_wilayah_khusus') or {}).items() %}
+          <tr><td>{{ n | replace('(>=20%)', '(gambut ≥ 20%)') | replace('Wilayah gambut (gambut ≥ 20%)', 'Wilayah gambut (≥ 20%)') }}</td><td>{{ d.R2 | angka(2) }}</td><td>{{ d.MAE | angka(3) }}</td></tr>
+          {% endfor %}
+        </table>
+        <p class="muted small-2"><b>R²</b> (0–1) menunjukkan seberapa baik estimasi mengikuti naik-turunnya nilai sebenarnya;
+          makin mendekati 1 makin baik. <b>MAE</b> adalah rata-rata selisih antara estimasi dan nilai acuan SMAP L4;
+          makin kecil makin baik.</p>
+        {% else %}
+        <p class="muted">Informasi akurasi belum tersedia (jalankan script 05).</p>
+        {% endif %}
+      </section>
+      <section class="card info-card dev" id="pengembang">
+        <div class="avatar">MA</div>
+        <div><div class="muted small-2">Pengembang</div><b>Muhammad Afzaal</b></div>
+      </section>
+    </div>
+    <div class="info-stack">
+      <section class="card info-card" id="data">
+      <h2>Data dan metode</h2>
+      <div class="chips">
+        {% for s in ['SMAP Level 4', 'CHIRPS', 'ERA5-Land', 'MODIS', 'SRTM', 'OpenLandMap', 'ESA WorldCover', 'Peta Lahan Gambut Kementan', 'FAO GAUL 2015'] %}
+        <span class="chip chip-grey">{{ s }}</span>{% endfor %}
+      </div>
+      <p>Estimasi dihasilkan oleh model terbaik dari perbandingan <i>Random Forest</i>, XGBoost, dan model gabungan
+        keduanya, lalu dijelaskan menggunakan SHAP. Data mencakup 442 kabupaten/kota pada periode Januari 2023 –
+        Juni 2026. Data hasil ekstraksi Google Earth Engine disimpan dalam basis data aplikasi, sehingga
+        aplikasi tidak perlu terhubung langsung ke Google Earth Engine saat digunakan.</p>
+      <table class="src">
+        <tr><th>Variabel</th><th>Sumber</th></tr>
+        <tr><td><i>Soil moisture</i> (target)</td><td>SMAP Level 4</td></tr>
+        <tr><td>Curah hujan</td><td>CHIRPS</td></tr>
+        <tr><td>Suhu udara, titik embun, radiasi, angin, suhu tanah</td><td>ERA5-Land</td></tr>
+        <tr><td>NDVI, LST</td><td>MODIS</td></tr>
+        <tr><td>Elevasi, kemiringan lereng</td><td>SRTM</td></tr>
+        <tr><td>Kandungan liat</td><td>OpenLandMap</td></tr>
+        <tr><td>Proporsi badan air dan lahan pertanian</td><td>ESA WorldCover 2021</td></tr>
+        <tr><td>Proporsi lahan gambut</td><td>Peta Lahan Gambut Indonesia 1:50.000 (Kementan, 2019), melalui Trase</td></tr>
+        <tr><td>Batas kabupaten/kota (442 wilayah)</td><td>FAO GAUL 2015</td></tr>
+      </table>
+      <p class="muted small-2">Badan air dihitung dari kelas "Permanent water bodies" ESA WorldCover; laut dikeluarkan
+        dengan elevasi SRTM dan jarak dari garis pantai. Lahan pertanian dihitung dari kelas "Cropland" (tanaman semusim).
+        Nilai rata-rata nasional adalah rata-rata seluruh kabupaten/kota, dengan bobot yang sama untuk setiap wilayah.</p>
+    </section>
+      <section class="card info-card" id="teknologi">
+        <h2>Teknologi yang digunakan</h2>
+        <table class="src">
+          <tr><th>Bagian</th><th>Teknologi</th></tr>
+          <tr><td>Ekstraksi data</td><td>Google Earth Engine (dijalankan melalui Google Colab)</td></tr>
+          <tr><td>Pengolahan data</td><td>Python, pandas, NumPy</td></tr>
+          <tr><td>Model</td><td>scikit-learn (<i>Random Forest</i>), XGBoost</td></tr>
+          <tr><td>Interpretasi model</td><td>SHAP</td></tr>
+          <tr><td>Basis data</td><td>SQLite</td></tr>
+          <tr><td>Aplikasi web</td><td>Flask dan Jinja2 (sisi server); HTML, CSS, JavaScript, peta SVG (sisi pengguna)</td></tr>
+        </table>
+      </section>
+      <section class="card info-card" id="batasan">
+        <h2>Batasan</h2>
+        <ul class="limits">
+          <li>Estimasi bersifat bulanan per kabupaten/kota, tidak menggambarkan variasi di dalam wilayah maupun variasi harian.</li>
+          <li>Estimasi menggambarkan kondisi pada periode yang datanya tersedia, bukan prediksi untuk bulan mendatang.</li>
+          <li>Estimasi di wilayah gambut kurang akurat dibanding wilayah lain, karena muka air tanah dan drainase tidak
+            tercakup dalam variabel model.</li>
+          <li>Satu piksel SMAP L4 berukuran sekitar 9 km, sehingga nilai kota yang kecil dapat ikut dipengaruhi sungai,
+            rawa, atau laut di sekitarnya.</li>
+          <li>Batas wilayah mengikuti FAO GAUL 2015 (442 kabupaten/kota); kabupaten/kota hasil pemekaran setelahnya
+            tergabung dengan wilayah induknya.</li>
+          <li>Kelas lahan pertanian ESA WorldCover hanya mencakup tanaman semusim, sehingga perkebunan tidak termasuk.</li>
+        </ul>
+      </section>
+      
+    </div>
+  </div>
+</div>
+<script>
+  // tandai menu samping sesuai bagian yang sedang terlihat
+  (function () {
+    const tautan = [...document.querySelectorAll('.info-nav a')];
+    const nav = document.querySelector('.info-nav'), tombol = nav.querySelector('.info-menu');
+    const aktif = document.getElementById('info-aktif');
+    const obs = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) return;
+      tautan.forEach(a => {
+        const on = a.getAttribute('href') === '#' + e.target.id;
+        a.classList.toggle('on', on);
+        if (on) aktif.textContent = a.textContent;
+      });
+    }), { rootMargin: '-30% 0px -60% 0px' });
+    // menu ringkas di HP menempel tepat di bawah menu utama
+    const atasNav = () => { nav.style.top = innerWidth <= 960 ? (document.querySelector('.nav').offsetHeight + 8) + 'px' : ''; };
+    atasNav(); addEventListener('resize', atasNav);
+    // menu ringkas di HP: buka/tutup, dan tutup setelah memilih
+    tombol.addEventListener('click', () => {
+      const buka = nav.classList.toggle('buka');
+      tombol.setAttribute('aria-expanded', buka);
+    });
+    tautan.forEach(a => a.addEventListener('click', () => { nav.classList.remove('buka'); tombol.setAttribute('aria-expanded', 'false'); }));
+    tautan.forEach(a => { const s = document.querySelector(a.getAttribute('href')); if (s) obs.observe(s); });
+  })();
+</script>
+{% endblock %}

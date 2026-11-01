@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% import "_ringkasan.html" as R %}
+{% block title %}SoilWatch ID · Pantau kelembapan tanah kabupaten/kota{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-text">
+    <span class="chip">Pemantauan bulanan tingkat kabupaten/kota</span>
+    <h1>Pantau kelembapan tanah di setiap kabupaten/kota Indonesia</h1>
+    <p class="lead">Estimasi <i>soil moisture</i> berbasis <i>machine learning</i> dari data penginderaan jauh,
+      disertai penjelasan faktor lingkungan yang memengaruhinya.</p>
+    <div class="cta">
+      <a class="btn p" href="{{ url_for('prediksi') }}">Mulai Estimasi
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="btn s" href="{{ url_for('otomatis') }}">Jelajahi Peta</a>
+    </div>
+    <dl class="stats">
+      <div><dt>{{ r.jumlah_wilayah }}</dt><dd>Kabupaten/<wbr>kota</dd></div>
+      <div><dt>{{ r.jumlah_bulan }} bulan</dt><dd>{{ r.periode_awal }} – {{ r.periode_terbaru }}</dd></div>
+      <div><dt>12</dt><dd>Variabel lingkungan</dd></div>
+    </dl>
+  </div>
+
+  <figure class="card map-card">
+    <div class="map-head">
+      <div>
+        <div class="map-title">Kondisi kelembapan tanah</div>
+        <div class="muted small">{{ r.periode_terbaru }} · SMAP Level 4, rata-rata nasional
+          {{ ('%.2f' % r.rata2_nasional).replace('.', ',') if r.rata2_nasional is not none else '-' }} m³/m³</div>
+      </div>
+      <span class="chip chip-grey">Pratinjau peta</span>
+    </div>
+    <a class="map-img map-link" href="{{ url_for('otomatis') }}" aria-label="Buka peta interaktif di Mode Otomatis">{{ peta }}</a>
+    <figcaption class="map-foot">
+      <div class="legend">
+        <div class="legend-lbl"><span>Kering</span><span>Basah</span></div>
+        <div class="legend-ramp"></div>
+        <div class="legend-tick"><span>0,10</span><span>0,20</span><span>0,30</span><span>0,40</span><span>0,50</span></div>
+      </div>
+      <span class="muted small petunjuk-kursor">Arahkan kursor untuk melihat nilai, klik untuk membuka peta interaktif</span>
+      <span class="muted small petunjuk-sentuh">Ketuk peta untuk membuka peta interaktif</span>
+    </figcaption>
+  </figure>
+</section>
+
+{% if rk %}
+<section class="card rk-nas" aria-labelledby="judul-rk">
+  <div class="card-h wrap">
+    <div><h2 id="judul-rk">Kondisi Indonesia {{ rk.awal[-4:] }}–{{ rk.akhir[-4:] }}</h2>
+      <p class="muted small-2">Rata-rata <i>soil moisture</i> seluruh kabupaten/kota (SMAP L4), {{ rk.awal }} – {{ rk.akhir }}</p></div>
+    <div class="chips">
+      {% if rk.status %}<span class="chip {{ 'chip-kering' if rk.status == 'kering' else 'chip-basah' if rk.status == 'basah' else 'chip-grey' }}">{{ rk.pilih }}: {{ rk.status_teks }}</span>{% endif %}
+      <span class="chip chip-grey">Rata-rata terendah: {{ rk.rendah }}</span>
+    </div>
+  </div>
+  <div class="rk-grid">
+    <div>
+      <h3 class="rk-h">Kesimpulan singkat</h3>
+      {{ R.kesimpulan(rk) }}
+      <h3 class="rk-h">Rata-rata per tahun (m³/m³)</h3>
+      {{ R.tahunan(rk) }}
+      {% if sb %}
+      <h3 class="rk-h rk-jarak">Kondisi kabupaten/kota, {{ sb.label }}</h3>
+      <p class="muted small-2 rk-ket">Dibanding rata-rata {{ sb.pembanding }} di masing-masing wilayah ({{ sb.total }} wilayah).</p>
+      <div class="sb-bar" role="img" aria-label="Sebaran kondisi kabupaten/kota">
+        {% for b in sb.bagian %}{% if b.jumlah %}<i class="sb-{{ b.kunci }}" style="width:{{ b.persen }}%"></i>{% endif %}{% endfor %}
+      </div>
+      <div class="sb-leg">
+        {% for b in sb.bagian %}<div><span class="sb-dot sb-{{ b.kunci }}"></span><b>{{ b.jumlah }}</b> wilayah {{ b.teks }} <small>({{ '%.0f' % b.persen }}%)</small></div>{% endfor %}
+      </div>
+      {% endif %}
+      <h3 class="rk-h rk-jarak">Unduh data (CSV)</h3>
+      <form class="unduh-form" action="{{ url_for('unduh_semua') }}" method="get">
+        <label class="sel"><select name="jenis" aria-label="Jenis data" onchange="this.form.tahun.disabled = this.value !== 'bulanan'">
+          <option value="nasional">Rata-rata nasional per bulan</option>
+          <option value="bulanan">Seluruh kabupaten/kota, per bulan</option>
+          <option value="tahunan">Seluruh kabupaten/kota, rata-rata tahunan</option>
+        </select></label>
+        <label class="sel"><select name="tahun" aria-label="Tahun" disabled>
+          <option value="">Semua tahun</option>
+          {% for t in tahun_data %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
+        </select></label>
+        <button class="btn g sm" type="submit">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Unduh CSV</button>
+      </form>
+    </div>
+    <div>
+      {% set g = rk.garis %}
+      <h3 class="rk-h">Rata-rata nasional per bulan (m³/m³)</h3>
+      <div class="trend-gulir"><svg class="rk-garis" viewBox="0 0 {{ g.W }} {{ g.H }}" role="img" aria-label="Grafik rata-rata soil moisture nasional per bulan">
+        {% for y in g.gy %}<line x1="{{ g.L }}" x2="{{ g.W - g.R }}" y1="{{ y.y }}" y2="{{ y.y }}" class="gl"/><text x="{{ g.L - 8 }}" y="{{ y.y + 4 }}" text-anchor="end">{{ y.teks }}</text>{% endfor %}
+        {{ R.sumbu_bulan(g) }}
+        <polygon points="{{ g.area }}" class="ar"/>
+        <polyline points="{{ g.garis }}" class="ln"/>
+        <line x1="{{ g.titik.x }}" x2="{{ g.titik.x }}" y1="{{ g.T }}" y2="{{ g.H - g.B }}" class="cur"/>
+        <circle cx="{{ g.titik.x }}" cy="{{ g.titik.y }}" r="4.5" class="pt"/>
+        <text x="{{ g.titik.x + (-8 if g.titik.x > g.W * 0.75 else 8) }}" y="{{ [g.titik.y - 9, 22] | max }}" text-anchor="{{ 'end' if g.titik.x > g.W * 0.75 else 'start' }}" class="pt-t">{{ g.titik.teks }}</text>
+        {{ R.titik_tooltip(g) }}
+      </svg></div>
+      <div class="tip-grafik" hidden></div>
+      <h3 class="rk-h">Pola bulanan <span class="muted">· rata-rata tiap bulan</span></h3>
+      {{ R.pola(rk) }}
+    </div>
+  </div>
+  <p class="rk-cat muted">Dihitung dari nilai acuan SMAP L4 dan ikut diperbarui setiap kali data bulan baru ditambahkan.
+    Pilih wilayah di <a href="{{ url_for('otomatis') }}">Mode Otomatis</a> untuk melihat ringkasan per kabupaten/kota.</p>
+</section>
+{% endif %}
+
+{% if pk %}
+<section class="card pk" aria-labelledby="judul-pk">
+  <div class="card-h wrap">
+    <div><h2 id="judul-pk">Wilayah yang perlu diperhatikan · {{ pk.label }}</h2>
+      <p class="muted small-2">Lima kabupaten/kota dengan <i>soil moisture</i> terendah dan tertinggi bulan ini (nilai acuan SMAP L4). Klik untuk melihat rinciannya.</p></div>
+  </div>
+  <div class="pk-grid">
+    {% for judul_daftar, daftar, kelas in [('Paling kering', pk.kering, 'kering'), ('Paling basah', pk.basah, 'basah')] %}
+    <div>
+      <h3 class="rk-h pk-h {{ kelas }}">{{ judul_daftar }}</h3>
+      <ol class="pk-list">
+        {% for w in daftar %}
+        <li><a href="{{ url_for('hasil', id=w.id, periode=pk.periode) }}">
+          <span class="pk-no">{{ w.no }}</span>
+          <span class="pk-nama"><b>{{ w.label }}</b><small>{{ w.prov }}{% if w.gambut %} · gambut{% endif %}</small></span>
+          <span class="pk-nilai"><i style="background:{{ w.warna }}"></i>{{ w.nilai | angka(2) }}</span>
+        </a></li>
+        {% endfor %}
+      </ol>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="guide card" aria-labelledby="judul-panduan">
+  <div class="guide-head">
+    <h2 id="judul-panduan">Cara menggunakan</h2>
+    <a class="small-2 link-more" href="{{ url_for('informasi') }}#cara">Panduan lengkap</a>
+  </div>
+  <ol class="guide-steps">
+    <li><b>Pilih mode</b><span><a href="{{ url_for('prediksi') }}">Prediksi</a>: Mode Otomatis untuk kondisi wilayah, Mode Simulasi untuk menguji skenario.</span></li>
+    <li><b>Pilih wilayah atau isi data</b><span>Klik kabupaten/kota pada peta dan pilih bulan, atau masukkan 12 nilai variabel lingkungan.</span></li>
+    <li><b>Baca hasil dan penjelasannya</b><span>Lihat nilai estimasi, faktor yang paling memengaruhinya (SHAP), dan tren bulanan wilayah.</span></li>
+  </ol>
+</section>
+
+<section class="features" aria-label="Fitur utama">
+  <article class="card feat">
+    <div class="feat-ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg></div>
+    <div><h3>Peta pemantauan</h3><p>Lihat kondisi kelembapan tanah seluruh kabupaten/kota per bulan, lengkap dengan penanda lahan gambut dan badan air.</p></div>
+  </article>
+  <article class="card feat">
+    <div class="feat-ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></div>
+    <div><h3>Estimasi dan simulasi</h3><p>Dapatkan estimasi untuk wilayah dan periode tertentu, atau uji skenario dengan nilai variabel Anda sendiri.</p></div>
+  </article>
+  <article class="card feat">
+    <div class="feat-ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 19V5M4 19h16"/><path d="M8 15l3-4 3 2 5-6"/></svg></div>
+    <div><h3>Penjelasan hasil</h3><p>Pahami faktor lingkungan yang paling memengaruhi setiap hasil estimasi melalui interpretasi SHAP.</p></div>
+  </article>
+</section>
+<script src="{{ url_for('static', filename='js/grafik.js') }}"></script>
+<script>
+  // pilihan tahun hanya aktif untuk data bulanan (juga setelah tombol "kembali" di browser)
+  (function () {
+    const f = document.querySelector('.unduh-form');
+    if (f) { const atur = () => { f.tahun.disabled = f.jenis.value !== 'bulanan'; }; atur(); window.addEventListener('pageshow', atur); }
+  })();
+</script>
+{% endblock %}

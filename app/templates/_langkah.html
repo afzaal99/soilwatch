@@ -1,0 +1,12 @@
+{# Penanda langkah: aktif = 1, 2, atau 3; label2 = teks langkah kedua #}
+{% macro langkah(aktif, label2) %}
+<ol class="steps" aria-label="Langkah">
+  {% for n, teks in [(1, 'Pilih mode'), (2, label2), (3, 'Lihat hasil')] %}
+  {% if n > 1 %}<li class="step-line" aria-hidden="true"></li>{% endif %}
+  <li class="step {{ 'done' if n < aktif else ('on' if n == aktif) }}" {% if n == aktif %}aria-current="step"{% endif %}>
+    <span class="step-dot">{% if n < aktif %}<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>{% else %}{{ n }}{% endif %}</span>
+    <span>{{ teks }}</span>
+  </li>
+  {% endfor %}
+</ol>
+{% endmacro %}

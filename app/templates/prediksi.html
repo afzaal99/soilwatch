@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% from "_langkah.html" import langkah %}
+{% block title %}Prediksi · SoilWatch ID{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="p-title">Prediksi Kelembapan Tanah</h1>
+    <p class="muted">Pilih cara memperoleh estimasi <i>soil moisture</i>.</p>
+  </div>
+  {{ langkah(1, 'Pilih wilayah / isi data') }}
+</div>
+
+<div class="modes">
+  <article class="card mode mode-main">
+    <div class="mode-head">
+      <div class="mode-ico solid"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg></div>
+      <div><h2>Mode Otomatis</h2><p class="muted">Estimasi kondisi wilayah pada periode tertentu</p></div>
+      <span class="chip">Disarankan</span>
+    </div>
+    <div class="mode-vis map-mini">{{ peta }}</div>
+    <ul class="checks">
+      <li>Pilih kabupaten/kota langsung pada peta</li>
+      <li>Nilai variabel lingkungan diambil otomatis dari basis data</li>
+      <li>Dilengkapi tren dan riwayat kelembapan tanah wilayah</li>
+    </ul>
+    <a class="btn s wide" href="{{ url_for('otomatis') }}">Pilih Wilayah di Peta
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+  </article>
+
+  <article class="card mode">
+    <div class="mode-head">
+      <div class="mode-ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></div>
+      <div><h2>Mode Simulasi</h2><p class="muted">Eksplorasi skenario dengan nilai variabel sendiri</p></div>
+    </div>
+    <div class="mode-vis sliders" aria-hidden="true">
+      {% for lab, val, pct in [('Curah hujan', '85 mm', 30), ('Suhu udara', '27,4 °C', 62), ('NDVI', '0,42', 45), ('Kandungan liat', '31 %', 55)] %}
+      <div class="sl"><span>{{ lab }}</span><div class="sl-track"><i style="width:{{ pct }}%"></i><b style="left:{{ pct }}%"></b></div><strong>{{ val }}</strong></div>
+      {% endfor %}
+    </div>
+    <ul class="checks">
+      <li>Masukkan nilai variabel lingkungan secara manual</li>
+      <li>Cocok untuk melihat dampak perubahan, misalnya curah hujan turun</li>
+      <li>Hasil berupa simulasi skenario, bukan kondisi aktual</li>
+    </ul>
+    <a class="btn s wide" href="{{ url_for('simulasi') }}">Isi Nilai Variabel
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+  </article>
+</div>
+<p class="hint"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+  Belum yakin? Mulai dari <b>Mode Otomatis</b> untuk melihat kondisi wilayah Anda pada bulan tertentu.</p>
+{% endblock %}

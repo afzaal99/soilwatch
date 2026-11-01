@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% import "_ringkasan.html" as R %}
+{% from "_langkah.html" import langkah %}
+{% block title %}{{ judul }} · Hasil · SoilWatch ID{% endblock %}
+{% block content %}
+{% set pos = ((v - 0.10) / 0.40 * 100) %}
+{% set pos = [[pos, 1] | max, 99] | min %}
+<div class="page-head">
+  <div>
+    <div class="title-row">
+      <h1 class="p-title">{{ judul }}</h1>
+      <span class="chip">{{ 'Mode Otomatis' if mode == 'otomatis' else 'Mode Simulasi' }}</span>
+    </div>
+    <p class="muted">{{ sub }}</p>
+  </div>
+  <div class="head-right">
+    {{ langkah(3, 'Pilih wilayah' if mode == 'otomatis' else 'Isi nilai variabel') }}
+    {% if mode == 'otomatis' %}
+    <a class="btn s sm" href="{{ url_for('otomatis', id=wid, periode=periode) }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Kembali ke Peta</a>
+    {% else %}
+    <a class="btn s sm" href="{{ kembali }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Ubah Nilai</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="res-grid">
+  <section class="card res-card">
+    <div class="muted">Estimasi kelembapan tanah</div>
+    <div class="big-val">{{ v | angka(2) }}<span>m³/m³</span></div>
+    <div class="gauge"><div class="legend-ramp"></div><i style="left:{{ pos }}%"></i></div>
+    <div class="legend-lbl muted"><span>Kering</span><span>Basah</span></div>
+    <div class="note">
+      {% if mode == 'otomatis' %}Kelembapan tanah wilayah ini tergolong <b>{{ kategori }}</b> dibandingkan sebaran kabupaten/kota lain pada data latih.
+      {% else %}Dengan nilai variabel ini, kelembapan tanah tergolong <b>{{ kategori }}</b> dibandingkan sebaran kabupaten/kota pada data latih.{% endif %}
+    </div>
+    <ul class="meta">
+      <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Dihitung dengan {{ sumber }}.</li>
+      {% if mode == 'otomatis' and smap is not none %}
+      <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>Nilai acuan SMAP L4 bulan ini: {{ smap | angka(2) }} m³/m³.</li>
+      {% endif %}
+      {% if mode == 'otomatis' and penanda[1] >= 20 %}
+      <li class="warn-t"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>Wilayah berbadan air luas: tafsirkan dengan hati-hati.</li>
+      {% endif %}
+    </ul>
+    {% if mode == 'otomatis' and penanda[0] >= 20 %}
+    <div class="note warn">
+      <b>Wilayah gambut ({{ penanda[0] }}% luas wilayah).</b>
+      {% if gambut %}Pada data uji, estimasi di wilayah gambut meleset rata-rata ±{{ gambut.mae | angka(3) }} m³/m³
+      (R² {{ gambut.r2 | angka(2) }}). Perkiraan rentang:
+      <b>{{ gambut.bawah | angka(2) }}–{{ gambut.atas | angka(2) }} m³/m³</b>.
+      {% else %}Estimasi di wilayah gambut kurang akurat dibandingkan wilayah lain.{% endif %}
+    </div>
+    {% endif %}
+    {% if mode == 'otomatis' %}
+    <a class="btn s wide" href="{{ url_for('simulasi', dari=wid, periode=periode) }}">Coba Skenario di Mode Simulasi</a>
+    {% else %}
+    <a class="btn s wide" href="{{ url_for('otomatis') }}">Lihat Kondisi Wilayah Nyata</a>
+    {% endif %}
+  </section>
+
+  <section class="card res-card">
+    <div class="card-h"><h2>Mengapa hasilnya {{ v | angka(2) }}?</h2>{% if not wf.asli %}<span class="chip chip-grey sm">Contoh</span>{% endif %}</div>
+    <p class="muted small-2">Interpretasi lokal (SHAP) · kontribusi tiap variabel</p>
+    <div class="wf">
+      <div class="wf-ov"><div class="wf-base {{ 'kanan' if wf.base_pos > 60 }}" style="left:{{ wf.base_pos }}%"><span>rata-rata model {{ wf.base | angka(2) }}</span></div></div>
+      {% for r in wf.rows %}
+      <div class="wf-row">
+        <div class="wf-lab"><span class="wf-nama">{{ r.label }}{% if r.nilai_x %}<small>{{ r.nilai_x }} {{ r.satuan }}</small>{% endif %}</span><em class="wf-nilai-hp {{ 'up' if r.naik else 'down' }}">{{ r.teks }}</em></div>
+        <div class="wf-track">
+          <i class="{{ 'up' if r.naik else 'down' }}" style="left:{{ r.kiri }}%;width:{{ r.lebar }}%"></i>
+          <b class="{{ 'up' if r.naik else 'down' }}" style="{{ ('left:calc(' ~ (r.kiri + r.lebar) ~ '% + 6px)') if r.naik else ('right:calc(' ~ (100 - r.kiri) ~ '% + 6px)') }}">{{ r.teks }}</b>
+        </div>
+      </div>
+      {% endfor %}
+      <div class="wf-row wf-end"><div class="wf-lab"></div><div class="wf-track"><span class="{{ 'kiri' if wf.hasil_pos < 18 else ('kanan' if wf.hasil_pos > 82) }}" style="left:{{ wf.hasil_pos }}%">hasil {{ v | angka(2) }}</span></div></div>
+    </div>
+    <div class="wf-legend"><span><i class="up"></i>menaikkan</span><span><i class="down"></i>menurunkan</span></div>
+    {% if wf.utama %}
+    {% set statis = wf.utama.label in ['Elevasi', 'Kemiringan lereng', 'Kandungan liat'] %}
+    <div class="note ok">{{ wf.utama.label }} paling {{ 'menaikkan' if wf.utama.naik else 'menurunkan' }} estimasi{% if mode == 'otomatis' %}{{ ' di wilayah ini' if statis else ' bulan ini' }}{% else %} pada skenario ini{% endif %}.</div>
+    {% endif %}
+  </section>
+
+  <section class="card res-card">
+    <div class="card-h"><h2>Faktor paling berpengaruh secara umum</h2>{% if sumber_kepentingan != 'shap' %}<span class="chip chip-grey sm">Sementara</span>{% endif %}</div>
+    <p class="muted small-2">Interpretasi global (SHAP) · dihitung pada data uji</p>
+    <div class="gbars">
+      {% for g in glob %}
+      <div class="gbar {{ 'lain' if g.lain }}"><span>{{ g.label }}</span><div><i style="width:{{ g.lebar }}%;opacity:{{ 1 - loop.index0 * 0.11 }}"></i></div><b>{{ g.persen | round | int }}%</b></div>
+      {% endfor %}
+    </div>
+    <div class="note">Grafik ini sama untuk semua wilayah dan menggambarkan perilaku model secara keseluruhan.</div>
+  </section>
+</div>
+
+{% if mode == 'otomatis' %}
+<section class="card trend">
+  <div class="card-h wrap">
+    <div><h2>Tren dan riwayat wilayah</h2>
+      <p class="muted small-2"><i>Soil moisture</i> bulanan {{ judul }}, {{ tren.awal }} – {{ tren.akhir }} (m³/m³)</p></div>
+    <div class="chips"><span class="chip chip-grey">Terendah: {{ tren.rendah }}</span><span class="chip chip-grey">Tertinggi: {{ tren.tinggi }}</span>
+      <a class="btn g sm" href="{{ url_for('unduh_wilayah', wid=wid) }}" download>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Unduh CSV</a>
+      <button type="button" class="btn g sm" onclick="window.print()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 9V3h10v6M7 17H4v-7h16v7h-3M7 14h10v7H7z"/></svg>Cetak</button></div>
+  </div>
+  <div class="trend-gulir"><svg class="trend-svg" viewBox="0 0 {{ tren.W }} {{ tren.H }}" role="img" aria-label="Grafik tren soil moisture bulanan">
+    {% for g in tren.gy %}<line x1="{{ tren.L }}" x2="{{ tren.W - tren.R }}" y1="{{ g.y }}" y2="{{ g.y }}" class="gl"/><text x="{{ tren.L - 8 }}" y="{{ g.y + 4 }}" text-anchor="end">{{ g.teks }}</text>{% endfor %}
+    {{ R.sumbu_bulan(tren) }}
+    <polygon points="{{ tren.area }}" class="ar"/>
+    <polyline points="{{ tren.garis }}" class="ln"/>
+    <line x1="{{ tren.titik.x }}" x2="{{ tren.titik.x }}" y1="10" y2="{{ tren.H - tren.B }}" class="cur"/>
+    <circle cx="{{ tren.titik.x }}" cy="{{ tren.titik.y }}" r="5" class="pt"/>
+    <text x="{{ tren.titik.x + (-10 if tren.titik.x > tren.W * 0.8 else 10) }}" y="{{ tren.titik.y - 10 }}" text-anchor="{{ 'end' if tren.titik.x > tren.W * 0.8 else 'start' }}" class="pt-t">{{ tren.titik.teks }}</text>
+    {{ R.titik_tooltip(tren) }}
+  </svg></div>
+  <div class="tip-grafik" hidden></div>
+  {% if rk %}
+  <div class="rk-grid">
+    <div>
+      <h3 class="rk-h">Kesimpulan singkat</h3>
+      {{ R.kesimpulan(rk) }}
+      <h3 class="rk-h">Rata-rata per tahun (m³/m³)</h3>
+      {{ R.tahunan(rk) }}
+    </div>
+    <div>
+      <h3 class="rk-h">Pola bulanan <span class="muted">· rata-rata tiap bulan, {{ rk.awal }} – {{ rk.akhir }}</span></h3>
+      {{ R.pola(rk) }}
+    </div>
+  </div>
+  <p class="rk-cat muted">Berdasarkan nilai acuan SMAP L4 wilayah ini, bukan hasil prediksi model.</p>
+  {% endif %}
+</section>
+{% else %}
+<section class="card trend">
+  <div class="card-h"><h2>Nilai variabel skenario</h2></div>
+  <div class="in-grid">
+    {% for f in fitur %}
+    <div><span class="muted">{{ info[f][0] }}</span><b>{{ x[f] | angka(2 if f in ('ndvi', 'slope') else 1) }} <small>{{ '' if info[f][1] == '–' else info[f][1] }}</small></b></div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% if not wf.asli or sumber_kepentingan != 'shap' %}
+<p class="foot-note">{% if not wf.asli %}Penjelasan lokal SHAP masih berupa <b>contoh</b> (model atau pustaka SHAP belum tersedia). {% endif %}{% if sumber_kepentingan != 'shap' %}Grafik faktor berpengaruh secara umum masih sementara, menunggu hasil script 06.{% endif %}</p>
+{% endif %}
+<script src="{{ url_for('static', filename='js/grafik.js') }}"></script>
+{% endblock %}
