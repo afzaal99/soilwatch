@@ -182,8 +182,12 @@
     const ph = D.ph && D.ph[pilih];
     rPh.hidden = !ph;
     if (ph) {
-      document.getElementById('v-ph').textContent = `${String(ph[0]).replace('.', ',')} · ${ph[1]}`;
-      document.getElementById('s-ph').style.background = WARNA_PH[ph[1]] || '#94A3B8';
+      const warna = WARNA_PH[ph[1]] || '#94A3B8';
+      document.getElementById('v-ph').textContent = Number(ph[0]).toFixed(1).replace('.', ',');
+      const kls = document.getElementById('k-ph');
+      kls.textContent = ph[1];
+      kls.style.setProperty('--c', warna);
+      document.getElementById('s-ph').style.background = warna;
     }
     const tanda = [g >= AMBANG && 'gambut', a >= AMBANG && 'badan air'].filter(Boolean);
     let cat = tanda.length

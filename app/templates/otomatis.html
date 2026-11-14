@@ -83,7 +83,10 @@
       <div class="bar"><i id="b-air" class="b-air"></i></div>
       <div class="bar-row"><span><i class="sym-tani"></i>Lahan pertanian</span><b id="v-tani"></b></div>
       <div class="bar"><i id="b-tani" class="b-tani"></i></div>
-      <div class="bar-row ph-baris" id="r-ph" hidden><span><i class="sym-ph" id="s-ph"></i>pH tanah (0–30 cm)</span><b id="v-ph"></b></div>
+      <div class="bar-row ph-baris" id="r-ph" hidden>
+        <span class="ph-label"><i class="sym-ph" id="s-ph"></i>pH tanah <small class="muted">0–30 cm</small></span>
+        <span class="ph-isi"><b id="v-ph"></b><em class="ph-kls" id="k-ph"></em></span>
+      </div>
       <div class="note" id="w-catatan"></div>
       <div class="side-foot">
         <a class="btn p wide" id="ke-hasil" href="#">Lihat Hasil Estimasi
@@ -94,13 +97,17 @@
   </aside>
 </div>
 <section class="card pk-oto" id="pk-oto" hidden aria-labelledby="judul-pk-oto">
-  <div class="card-h wrap">
-    <div><h2 id="judul-pk-oto">Wilayah yang perlu diperhatikan</h2>
-      <p class="muted small-2"><span id="pk-oto-per"></span> · lima kabupaten/kota dengan <i>soil moisture</i> terendah dan tertinggi (nilai acuan SMAP L4). Klik untuk memilihnya di peta.</p></div>
+  <div class="pk-oto-kepala">
+    <div class="pk-oto-judul">
+      <h2 id="judul-pk-oto">Wilayah yang perlu diperhatikan</h2>
+      <span class="chip chip-grey" id="pk-oto-per"></span>
+    </div>
+    <p class="muted small-2">Lima kabupaten/kota dengan <i>soil moisture</i> terendah dan tertinggi menurut SMAP L4.
+      Pilih salah satu untuk melihatnya di peta.</p>
   </div>
   <div class="pk-oto-grid">
-    <div><div class="pk-oto-h kering">Paling kering</div><ol class="pk-oto-list" id="pk-kering"></ol></div>
-    <div><div class="pk-oto-h basah">Paling basah</div><ol class="pk-oto-list" id="pk-basah"></ol></div>
+    <div><div class="pk-oto-h kering"><span>Paling kering</span><small>m³/m³</small></div><ol class="pk-oto-list" id="pk-kering"></ol></div>
+    <div><div class="pk-oto-h basah"><span>Paling basah</span><small>m³/m³</small></div><ol class="pk-oto-list" id="pk-basah"></ol></div>
   </div>
 </section>
 <script src="{{ url_for('static', filename='js/otomatis.js') }}"></script>
