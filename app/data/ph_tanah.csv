@@ -1,0 +1,515 @@
+ADM2_CODE,ADM2_NAME,ADM1_NAME,ph_0cm,ph_10cm,ph_30cm,ph_p10,ph_p90
+125991,Aceh Barat Daya,Aceh,5.295,5.275,5.324,4.867,5.733
+125992,Aceh Besar,Aceh,5.323,5.304,5.328,4.900,5.733
+125993,Aceh Jaya,Aceh,5.061,5.045,5.088,4.733,5.467
+125994,Aceh Selatan,Aceh,5.129,5.111,5.183,4.767,5.533
+125995,Aceh Singkil,Aceh,5.020,5.000,5.093,4.700,5.433
+125996,Aceh Tamiang,Aceh,5.267,5.247,5.303,4.833,5.767
+125997,Aceh Tengah,Aceh,5.237,5.212,5.249,4.900,5.600
+125998,Aceh Tenggara,Aceh,5.049,5.030,5.099,4.700,5.500
+125999,Aceh Timur,Aceh,5.160,5.139,5.179,4.800,5.600
+126000,Aceh Utara,Aceh,5.411,5.392,5.456,5.000,5.800
+126001,Bener Meriah,Aceh,5.295,5.269,5.312,4.933,5.633
+126002,Bireuen,Aceh,5.532,5.507,5.566,5.100,5.900
+126003,Gayo Lues,Aceh,5.052,5.030,5.078,4.733,5.400
+126004,Kota Banda Aceh,Aceh,5.638,5.652,5.722,5.433,5.933
+126005,Kota Langsa,Aceh,5.535,5.527,5.614,4.933,6.467
+126006,Kota Lhokseumawe,Aceh,5.635,5.620,5.680,5.433,5.833
+126007,Kota Sabang,Aceh,4.931,4.924,5.032,4.633,5.267
+126008,Kota Subulussalam,Aceh,5.243,5.228,5.290,4.833,5.667
+126010,Pidie,Aceh,5.316,5.294,5.330,4.900,5.700
+126011,Pidie Jaya,Aceh,5.406,5.387,5.419,4.900,5.767
+126012,Simeulue,Aceh,5.017,4.989,5.073,4.633,5.400
+125990,Aceh Barat,Aceh,5.196,5.172,5.213,4.800,5.600
+126009,Nagan Raya,Aceh,5.254,5.231,5.278,4.900,5.600
+126014,Bangli,Bali,5.217,5.195,5.237,4.900,5.600
+126017,Jembrana,Bali,5.269,5.244,5.268,4.900,5.600
+126018,Karang Asem,Bali,5.368,5.348,5.385,4.967,5.900
+126019,Klungkung,Bali,5.517,5.502,5.529,5.033,5.900
+126020,Kota Denpasar,Bali,5.713,5.719,5.769,5.433,6.033
+126021,Tabanan,Bali,5.064,5.049,5.077,4.800,5.300
+126013,Badung,Bali,5.372,5.353,5.386,5.000,5.867
+126015,Buleleng,Bali,5.413,5.398,5.434,4.967,5.967
+126016,Gianyar,Bali,5.097,5.087,5.126,4.800,5.400
+126022,Kota Cilegon,Banten,5.602,5.581,5.623,5.133,6.000
+126023,Kota Serang,Banten,5.572,5.550,5.592,5.000,6.033
+126024,Kota Tangerang,Banten,5.725,5.721,5.771,5.333,6.133
+126025,Kota Tangerang Selatan,Banten,5.523,5.536,5.540,5.333,5.700
+126029,Tangerang,Banten,5.548,5.530,5.562,5.267,5.833
+126026,Lebak,Banten,5.016,5.000,5.035,4.633,5.400
+126027,Pandeglang,Banten,5.128,5.087,5.122,4.700,5.500
+126028,Serang,Banten,5.315,5.299,5.343,4.733,5.800
+126030,Bengkulu Selatan,Bengkulu,5.141,5.118,5.152,4.733,5.500
+126031,Bengkulu Tengah,Bengkulu,5.023,5.006,5.037,4.700,5.300
+126033,Kaur,Bengkulu,4.997,4.982,5.017,4.700,5.300
+126034,Kepahiang,Bengkulu,5.018,5.003,5.057,4.700,5.433
+126035,Kota Bengkulu,Bengkulu,5.028,4.997,5.093,4.767,5.333
+126036,Lebong,Bengkulu,4.887,4.868,4.927,4.633,5.200
+126038,Rejang Lebong,Bengkulu,4.970,4.953,5.000,4.700,5.300
+126032,Bengkulu Utara,Bengkulu,5.039,5.022,5.066,4.633,5.500
+126037,Mukomuko,Bengkulu,4.866,4.856,4.915,4.600,5.167
+126039,Seluma,Bengkulu,5.018,4.999,5.041,4.700,5.367
+126040,Bantul,Daerah Istimewa Yogyakarta,5.461,5.461,5.516,5.133,5.767
+126041,Gunung Kidul,Daerah Istimewa Yogyakarta,5.553,5.542,5.560,5.233,5.833
+126042,Kota Yogyakarta,Daerah Istimewa Yogyakarta,6.130,6.156,6.251,5.733,6.633
+126043,Kulon Progo,Daerah Istimewa Yogyakarta,5.381,5.370,5.405,5.000,5.733
+126044,Sleman,Daerah Istimewa Yogyakarta,5.447,5.447,5.503,5.133,5.767
+126047,Kota Jakarta Pusat,Dki Jakarta,6.042,6.057,6.107,5.500,6.633
+126045,Kepulauan Seribu,Dki Jakarta,5.916,5.907,6.096,5.133,6.800
+126046,Kota Jakarta Barat,Dki Jakarta,5.995,6.003,6.053,5.500,6.567
+126048,Kota Jakarta Selatan,Dki Jakarta,5.650,5.666,5.676,5.400,5.967
+126049,Kota Jakarta Timur,Dki Jakarta,5.777,5.791,5.817,5.433,6.200
+126050,Kota Jakarta Utara,Dki Jakarta,5.931,5.947,6.000,5.500,6.500
+126057,Batang Hari,Jambi,5.034,4.987,5.016,4.700,5.300
+126058,Bungo,Jambi,4.801,4.789,4.836,4.500,5.100
+126059,Kerinci,Jambi,4.927,4.916,4.973,4.667,5.233
+126060,Kota Jambi,Jambi,5.089,5.042,5.067,4.700,5.500
+126061,Kota Sungai Penuh,Jambi,4.968,4.956,5.016,4.667,5.333
+126062,Merangin,Jambi,4.829,4.819,4.871,4.567,5.100
+126063,Muaro Jambi,Jambi,5.003,4.945,4.981,4.733,5.233
+126064,Sarolangun,Jambi,4.835,4.809,4.852,4.567,5.133
+146474,Tanjung Jabung Barat,Jambi,4.962,4.925,4.966,4.633,5.267
+126067,Tebo,Jambi,4.778,4.771,4.814,4.500,5.100
+146475,Tanjung Jabung Timur,Jambi,4.943,4.888,4.935,4.700,5.167
+126085,Kota Sukabumi,Jawa Barat,5.576,5.578,5.642,5.333,5.833
+126068,Bandung,Jawa Barat,5.530,5.512,5.572,5.100,5.933
+146454,Bandung Barat,Jawa Barat,5.326,5.307,5.360,5.000,5.733
+126070,Bekasi,Jawa Barat,5.668,5.670,5.751,5.367,6.033
+126071,Bogor,Jawa Barat,5.281,5.265,5.301,4.900,5.700
+126072,Ciamis,Jawa Barat,5.142,5.133,5.175,4.767,5.533
+146457,Cianjur,Jawa Barat,5.403,5.377,5.414,5.000,5.800
+126074,Cirebon,Jawa Barat,5.629,5.631,5.690,5.333,6.000
+126075,Garut,Jawa Barat,5.438,5.415,5.462,5.067,5.800
+126076,Indramayu,Jawa Barat,5.691,5.696,5.786,5.433,6.100
+126077,Karawang,Jawa Barat,5.596,5.598,5.701,5.267,5.967
+126078,Kota Bandung,Jawa Barat,6.349,6.352,6.430,5.900,6.800
+126086,Kota Tasikmalaya,Jawa Barat,5.353,5.352,5.411,5.100,5.700
+126079,Kota Banjar,Jawa Barat,5.466,5.444,5.490,5.267,5.700
+126080,Kota Bekasi,Jawa Barat,5.631,5.642,5.663,5.400,5.900
+126081,Kota Bogor,Jawa Barat,5.364,5.364,5.422,5.033,5.733
+126082,Kota Cimahi,Jawa Barat,6.181,6.176,6.253,5.700,6.733
+126083,Kota Cirebon,Jawa Barat,5.631,5.630,5.703,5.400,5.900
+126084,Kota Depok,Jawa Barat,5.535,5.542,5.578,5.333,5.800
+126087,Kuningan,Jawa Barat,5.311,5.292,5.322,4.933,5.700
+126092,Sukabumi,Jawa Barat,5.320,5.296,5.327,4.933,5.700
+126093,Sumedang,Jawa Barat,5.436,5.415,5.458,5.033,5.800
+126094,Tasikmalaya,Jawa Barat,5.260,5.233,5.263,4.933,5.567
+126088,Majalengka,Jawa Barat,5.388,5.377,5.434,5.000,5.800
+126089,Pangandaran,Jawa Barat,5.167,5.143,5.175,4.800,5.500
+146467,Purwakarta,Jawa Barat,5.407,5.388,5.418,4.933,5.800
+126091,Subang,Jawa Barat,5.537,5.531,5.605,5.100,6.000
+126116,Kota Tegal,Jawa Tengah,5.743,5.767,5.840,5.433,6.267
+126108,Kebumen,Jawa Tengah,5.454,5.440,5.480,5.100,5.800
+146462,Kendal,Jawa Tengah,5.388,5.382,5.439,4.967,5.833
+126113,Kota Salatiga,Jawa Tengah,5.178,5.178,5.247,4.967,5.533
+126115,Kota Surakarta,Jawa Tengah,6.180,6.151,6.229,5.833,6.533
+126096,Banjarnegara,Jawa Tengah,5.252,5.238,5.272,4.900,5.600
+126097,Banyumas,Jawa Tengah,5.259,5.250,5.289,4.833,5.633
+126098,Batang,Jawa Tengah,5.223,5.214,5.258,4.867,5.600
+126099,Blora,Jawa Tengah,5.740,5.700,5.719,5.500,6.000
+146456,Boyolali,Jawa Tengah,5.524,5.512,5.553,5.100,5.900
+126101,Brebes,Jawa Tengah,5.355,5.355,5.403,4.933,5.733
+126102,Cilacap,Jawa Tengah,5.353,5.327,5.373,4.867,5.700
+126103,Demak,Jawa Tengah,5.777,5.781,5.884,5.467,6.200
+146459,Grobogan,Jawa Tengah,5.653,5.630,5.674,5.400,5.933
+126106,Jepara,Jawa Tengah,5.286,5.284,5.324,4.833,5.667
+126107,Karanganyar,Jawa Tengah,5.393,5.378,5.432,5.033,5.733
+126110,Klaten,Jawa Tengah,5.651,5.640,5.701,5.333,5.967
+126111,Kota Magelang,Jawa Tengah,5.613,5.610,5.697,5.367,5.900
+126112,Kota Pekalongan,Jawa Tengah,5.622,5.628,5.736,5.233,6.167
+126117,Kudus,Jawa Tengah,5.523,5.510,5.578,5.033,6.067
+126118,Magelang,Jawa Tengah,5.231,5.225,5.282,4.933,5.533
+126119,Pati,Jawa Tengah,5.627,5.610,5.658,5.200,6.133
+126120,Pekalongan,Jawa Tengah,5.182,5.173,5.223,4.767,5.600
+126121,Pemalang,Jawa Tengah,5.424,5.415,5.460,5.067,5.800
+126122,Purbalingga,Jawa Tengah,5.295,5.290,5.323,4.833,5.700
+146469,Semarang,Jawa Tengah,5.366,5.352,5.396,5.033,5.800
+146472,Sragen,Jawa Tengah,5.524,5.519,5.567,5.300,5.833
+126127,Sukoharjo,Jawa Tengah,5.677,5.660,5.728,5.467,5.933
+126132,Wonosobo,Jawa Tengah,5.154,5.152,5.201,4.900,5.467
+126114,Kota Semarang,Jawa Tengah,5.683,5.683,5.734,5.300,6.133
+126123,Purworejo,Jawa Tengah,5.350,5.342,5.386,4.833,5.800
+126124,Rembang,Jawa Tengah,5.819,5.793,5.833,5.433,6.267
+126128,Tegal,Jawa Tengah,5.457,5.450,5.505,5.167,5.733
+126129,Temanggung,Jawa Tengah,5.218,5.202,5.251,4.900,5.533
+126131,Wonogiri,Jawa Tengah,5.559,5.548,5.593,5.233,5.867
+126142,Kota Batu,Jawa Timur,5.391,5.373,5.424,5.200,5.600
+126143,Kota Blitar,Jawa Timur,5.704,5.701,5.755,5.533,5.900
+126144,Kota Kediri,Jawa Timur,5.817,5.807,5.882,5.567,6.233
+126145,Kota Madiun,Jawa Timur,5.732,5.740,5.825,5.533,6.033
+126146,Kota Malang,Jawa Timur,5.944,5.947,6.035,5.500,6.533
+126147,Kota Mojokerto,Jawa Timur,5.922,5.932,6.043,5.733,6.233
+126134,Banyuwangi,Jawa Timur,5.428,5.408,5.444,5.100,5.733
+126135,Blitar,Jawa Timur,5.557,5.549,5.582,5.167,5.867
+126136,Bojonegoro,Jawa Timur,5.644,5.616,5.647,5.300,5.967
+126137,Bondowoso,Jawa Timur,5.599,5.583,5.636,5.267,5.967
+126140,Jombang,Jawa Timur,5.537,5.536,5.597,5.333,5.733
+126148,Kota Pasuruan,Jawa Timur,6.000,6.017,6.094,5.733,6.433
+126149,Kota Probolinggo,Jawa Timur,5.941,5.949,6.008,5.633,6.367
+126151,Lamongan,Jawa Timur,5.772,5.750,5.810,5.500,6.100
+126152,Lumajang,Jawa Timur,5.502,5.488,5.518,5.133,5.833
+126153,Madiun,Jawa Timur,5.508,5.498,5.567,5.233,5.767
+126154,Magetan,Jawa Timur,5.590,5.585,5.650,5.300,5.900
+126157,Nganjuk,Jawa Timur,5.587,5.580,5.642,5.300,5.900
+126159,Pacitan,Jawa Timur,5.477,5.460,5.480,5.133,5.800
+126160,Pamekasan,Jawa Timur,5.630,5.620,5.634,5.300,6.000
+126161,Pasuruan,Jawa Timur,5.690,5.679,5.727,5.300,6.133
+126162,Ponorogo,Jawa Timur,5.664,5.648,5.700,5.167,6.100
+126163,Probolinggo,Jawa Timur,5.633,5.620,5.662,5.133,6.133
+126164,Sampang,Jawa Timur,5.667,5.645,5.657,5.400,6.000
+126165,Sidoarjo,Jawa Timur,5.911,5.918,6.029,5.633,6.400
+126166,Situbondo,Jawa Timur,5.738,5.726,5.777,5.300,6.233
+126167,Sumenep,Jawa Timur,5.729,5.702,5.723,5.400,6.133
+126168,Trenggalek,Jawa Timur,5.443,5.425,5.455,5.067,5.900
+126169,Tuban,Jawa Timur,5.842,5.817,5.853,5.500,6.233
+126170,Tulungagung,Jawa Timur,5.644,5.634,5.674,5.300,5.933
+126133,Bangkalan,Jawa Timur,5.707,5.667,5.689,5.433,5.967
+126138,Gresik,Jawa Timur,5.650,5.632,5.697,4.967,6.133
+126139,Jember,Jawa Timur,5.506,5.493,5.534,5.100,5.900
+126141,Kediri,Jawa Timur,5.587,5.579,5.633,5.233,5.967
+126150,Kota Surabaya,Jawa Timur,6.355,6.354,6.407,5.767,6.900
+126155,Malang,Jawa Timur,5.479,5.464,5.513,5.133,5.833
+126156,Mojokerto,Jawa Timur,5.529,5.519,5.574,5.200,5.867
+126158,Ngawi,Jawa Timur,5.499,5.494,5.551,5.233,5.833
+126177,Kubu Raya,Kalimantan Barat,4.955,4.930,5.000,4.600,5.333
+126178,Landak,Kalimantan Barat,4.908,4.885,4.953,4.567,5.300
+126179,Melawi,Kalimantan Barat,4.697,4.681,4.735,4.400,5.067
+126182,Sanggau,Kalimantan Barat,4.851,4.823,4.881,4.533,5.200
+126183,Sekadau,Kalimantan Barat,4.808,4.783,4.886,4.500,5.233
+126184,Sintang,Kalimantan Barat,4.692,4.680,4.739,4.433,5.033
+126173,Kayong Utara,Kalimantan Barat,4.811,4.783,4.859,4.500,5.200
+126174,Ketapang,Kalimantan Barat,4.859,4.823,4.901,4.467,5.300
+126175,Kota Pontianak,Kalimantan Barat,5.061,5.045,5.108,4.700,5.500
+126190,Hulu Sungai Utara,Kalimantan Selatan,5.524,5.464,5.529,5.000,6.167
+126191,Kota Banjar Baru,Kalimantan Selatan,5.330,5.264,5.301,5.000,5.600
+126192,Kota Banjarmasin,Kalimantan Selatan,5.571,5.518,5.542,5.100,6.000
+126194,Tabalong,Kalimantan Selatan,4.949,4.928,4.969,4.533,5.300
+126195,Tanah Bumbu,Kalimantan Selatan,4.988,4.946,4.979,4.433,5.400
+126196,Tanah Laut,Kalimantan Selatan,5.150,5.090,5.119,4.733,5.567
+126185,Balangan,Kalimantan Selatan,4.952,4.934,4.976,4.600,5.300
+126188,Hulu Sungai Selatan,Kalimantan Selatan,5.366,5.317,5.367,4.833,5.867
+126189,Hulu Sungai Tengah,Kalimantan Selatan,5.074,5.056,5.103,4.700,5.433
+126197,Tapin,Kalimantan Selatan,5.286,5.217,5.261,4.833,5.733
+126186,Banjar,Kalimantan Selatan,5.080,5.038,5.078,4.433,5.700
+126187,Barito Kuala,Kalimantan Selatan,5.528,5.460,5.505,5.067,5.933
+126193,Kota Baru,Kalimantan Selatan,5.089,5.050,5.080,4.700,5.433
+126198,Barito Selatan,Kalimantan Tengah,4.867,4.821,4.868,4.533,5.267
+126199,Barito Timur,Kalimantan Tengah,4.984,4.936,4.972,4.600,5.267
+126201,Gunung Mas,Kalimantan Tengah,4.605,4.580,4.642,4.333,4.900
+126203,Katingan,Kalimantan Tengah,4.752,4.717,4.758,4.400,5.100
+126204,Kota Palangka Raya,Kalimantan Tengah,4.893,4.835,4.867,4.600,5.167
+126207,Lamandau,Kalimantan Tengah,4.786,4.753,4.815,4.367,5.233
+126208,Murung Raya,Kalimantan Tengah,4.622,4.614,4.674,4.333,4.967
+126209,Pulang Pisau,Kalimantan Tengah,5.024,4.958,4.992,4.667,5.333
+126210,Seruyan,Kalimantan Tengah,4.888,4.836,4.873,4.433,5.267
+126211,Sukamara,Kalimantan Tengah,5.056,4.997,5.032,4.733,5.333
+126200,Barito Utara,Kalimantan Tengah,4.672,4.641,4.691,4.467,4.900
+126202,Kapuas,Kalimantan Tengah,4.766,4.717,4.764,4.433,5.200
+126205,Kotawaringin Barat,Kalimantan Tengah,4.973,4.916,4.949,4.633,5.233
+126206,Kotawaringin Timur,Kalimantan Tengah,4.863,4.816,4.856,4.467,5.200
+126219,Mahakam Hulu,Kalimantan Timur,4.724,4.710,4.764,4.433,5.033
+126220,Paser,Kalimantan Timur,4.982,4.954,4.997,4.533,5.400
+126221,Penajam Paser Utara,Kalimantan Timur,4.962,4.925,4.957,4.400,5.333
+126213,Kota Balikpapan,Kalimantan Timur,4.949,4.911,4.944,4.633,5.300
+126215,Kota Samarinda,Kalimantan Timur,5.042,5.001,5.019,4.767,5.300
+126216,Kutai Barat,Kalimantan Timur,4.827,4.796,4.833,4.533,5.133
+126217,Kutai Kartanegara,Kalimantan Timur,5.003,4.975,5.013,4.600,5.333
+126227,Bangka,Kepulauan Bangka Belitung,4.834,4.805,4.830,4.500,5.100
+126228,Bangka Barat,Kepulauan Bangka Belitung,4.795,4.764,4.787,4.500,5.067
+126229,Bangka Selatan,Kepulauan Bangka Belitung,4.861,4.809,4.847,4.567,5.133
+126230,Bangka Tengah,Kepulauan Bangka Belitung,4.865,4.823,4.861,4.567,5.133
+126231,Belitung,Kepulauan Bangka Belitung,4.820,4.782,4.813,4.433,5.133
+126232,Belitung Timur,Kepulauan Bangka Belitung,4.859,4.817,4.839,4.567,5.100
+126233,Kota Pangkal Pinang,Kepulauan Bangka Belitung,4.992,4.959,4.982,4.600,5.400
+146464,Lingga,Kepulauan Riau,5.051,5.022,5.083,4.567,5.600
+126243,Kota Metro,Lampung,5.594,5.548,5.580,5.333,5.800
+126246,Lampung Tengah,Lampung,5.384,5.317,5.334,4.967,5.733
+126247,Lampung Timur,Lampung,5.267,5.186,5.211,4.833,5.600
+126248,Lampung Utara,Lampung,5.195,5.166,5.179,4.833,5.500
+146466,Pesisir Barat,Lampung,4.947,4.930,4.967,4.567,5.333
+126252,Pringsewu,Lampung,5.125,5.115,5.157,4.800,5.467
+126253,Tanggamus,Lampung,5.036,5.017,5.056,4.700,5.367
+126254,Tulang Bawang Barat,Lampung,5.423,5.350,5.372,5.133,5.633
+126255,Tulangbawang,Lampung,5.249,5.171,5.199,4.867,5.533
+126256,Way Kanan,Lampung,5.188,5.165,5.181,4.900,5.433
+126242,Kota Bandar Lampung,Lampung,5.307,5.302,5.349,4.833,5.733
+146463,Lampung Barat,Lampung,5.014,4.995,5.040,4.733,5.333
+126245,Lampung Selatan,Lampung,5.283,5.222,5.254,4.800,5.600
+126249,Mesuji,Lampung,5.175,5.101,5.139,4.867,5.433
+126250,Pesawaran,Lampung,5.097,5.075,5.113,4.733,5.500
+126264,Maluku Tenggara,Maluku,5.287,5.256,5.287,4.900,5.667
+126265,Kepulauan Tanimbar,Maluku,5.636,5.552,5.581,5.267,5.967
+126266,Seram Bagian Barat,Maluku,5.143,5.122,5.153,4.733,5.533
+126267,Seram Bagian Timur,Maluku,5.198,5.177,5.207,4.733,5.600
+126257,Buru,Maluku,5.219,5.198,5.226,4.867,5.600
+126258,Buru Selatan,Maluku,5.224,5.203,5.237,4.800,5.667
+126259,Kepulauan Aru,Maluku,5.296,5.249,5.260,4.900,5.633
+126260,Kota Ambon,Maluku,5.149,5.123,5.150,4.667,5.600
+126261,Kota Tual,Maluku,5.499,5.457,5.487,5.033,5.833
+126262,Maluku Barat Daya,Maluku,5.364,5.337,5.380,4.900,6.100
+126263,Maluku Tengah,Maluku,5.335,5.313,5.340,4.867,5.767
+126269,Halmahera Selatan,Maluku Utara,4.977,4.963,5.008,4.500,5.467
+126270,Halmahera Tengah,Maluku Utara,4.994,4.987,5.034,4.533,5.500
+126273,Kepulauan Sula,Maluku Utara,4.882,4.872,4.917,4.433,5.367
+126275,Kota Tidore Kepulauan,Maluku Utara,4.852,4.845,4.895,4.467,5.267
+126277,Pulau Taliabu,Maluku Utara,5.034,5.017,5.052,4.633,5.433
+126278,Bima,Nusa Tenggara Barat,5.708,5.685,5.719,5.167,6.300
+126279,Dompu,Nusa Tenggara Barat,5.704,5.681,5.717,5.100,6.300
+126280,Kota Bima,Nusa Tenggara Barat,5.688,5.676,5.732,5.367,6.067
+126281,Kota Mataram,Nusa Tenggara Barat,5.837,5.837,5.887,5.633,6.033
+126282,Lombok Barat,Nusa Tenggara Barat,5.344,5.333,5.367,4.933,5.733
+126283,Lombok Tengah,Nusa Tenggara Barat,5.582,5.572,5.617,5.167,6.000
+126284,Lombok Timur,Nusa Tenggara Barat,5.582,5.563,5.607,5.100,6.100
+126285,Lombok Utara,Nusa Tenggara Barat,5.310,5.294,5.336,4.800,5.900
+126286,Sumbawa,Nusa Tenggara Barat,5.468,5.445,5.480,4.900,6.133
+126287,Sumbawa Barat,Nusa Tenggara Barat,5.426,5.408,5.434,5.033,5.800
+126288,Alor,Nusa Tenggara Timur,5.653,5.631,5.668,5.233,6.100
+126289,Belu,Nusa Tenggara Timur,5.842,5.823,5.854,5.567,6.133
+126290,Ende,Nusa Tenggara Timur,5.538,5.513,5.546,5.100,6.000
+126291,Flores Timur,Nusa Tenggara Timur,5.610,5.586,5.618,5.100,6.100
+126292,Kota Kupang,Nusa Tenggara Timur,5.901,5.899,5.927,5.500,6.333
+126293,Kupang,Nusa Tenggara Timur,5.763,5.744,5.768,5.433,6.100
+126294,Lembata,Nusa Tenggara Timur,5.764,5.739,5.778,5.233,6.300
+126295,Malaka,Nusa Tenggara Timur,5.812,5.797,5.826,5.567,6.100
+126296,Manggarai,Nusa Tenggara Timur,5.384,5.358,5.392,5.000,5.800
+126297,Manggarai Barat,Nusa Tenggara Timur,5.485,5.464,5.497,5.000,6.033
+126298,Manggarai Timur,Nusa Tenggara Timur,5.533,5.510,5.546,5.100,5.933
+126299,Nagekeo,Nusa Tenggara Timur,5.787,5.766,5.808,5.233,6.333
+126300,Ngada,Nusa Tenggara Timur,5.586,5.563,5.604,5.100,6.200
+126301,Rote Ndao,Nusa Tenggara Timur,5.957,5.907,5.964,5.500,6.367
+126302,Sabu Raijua,Nusa Tenggara Timur,6.235,6.177,6.240,5.833,6.600
+126303,Sikka,Nusa Tenggara Timur,5.638,5.613,5.647,5.100,6.200
+126304,Sumba Barat,Nusa Tenggara Timur,5.678,5.658,5.673,5.367,6.000
+126305,Sumba Barat Daya,Nusa Tenggara Timur,5.734,5.716,5.741,5.400,6.100
+126306,Sumba Tengah,Nusa Tenggara Timur,5.773,5.750,5.775,5.300,6.533
+126307,Sumba Timur,Nusa Tenggara Timur,5.870,5.852,5.881,5.300,6.633
+126308,Timor Tengah Selatan,Nusa Tenggara Timur,5.762,5.741,5.768,5.433,6.100
+126309,Timor Tengah Utara,Nusa Tenggara Timur,5.870,5.851,5.884,5.533,6.233
+126353,Indragiri Hilir,Riau,5.000,4.969,5.018,4.700,5.267
+126354,Indragiri Hulu,Riau,4.943,4.921,4.963,4.533,5.300
+126355,Kampar,Riau,4.921,4.904,4.953,4.633,5.200
+126359,Kuantan Singingi,Riau,4.886,4.870,4.926,4.633,5.167
+126360,Pelalawan,Riau,5.053,5.018,5.056,4.767,5.300
+126361,Rokan Hilir,Riau,5.155,5.123,5.168,4.833,5.467
+126362,Rokan Hulu,Riau,4.961,4.939,4.994,4.667,5.267
+126364,Majene,Sulawesi Barat,5.324,5.301,5.335,4.933,5.700
+126365,Mamasa,Sulawesi Barat,5.096,5.088,5.124,4.800,5.400
+126366,Mamuju,Sulawesi Barat,5.142,5.128,5.174,4.767,5.533
+126367,Mamuju Tengah,Sulawesi Barat,5.097,5.081,5.130,4.733,5.433
+126368,Pasangkayu,Sulawesi Barat,5.068,5.056,5.109,4.733,5.400
+126369,Polewali Mandar,Sulawesi Barat,5.268,5.249,5.278,4.867,5.633
+126385,Pangkajene Dan Kepulauan,Sulawesi Selatan,5.557,5.540,5.568,4.967,6.067
+126386,Pinrang,Sulawesi Selatan,5.465,5.440,5.491,5.067,5.867
+126387,Sidenreng Rappang,Sulawesi Selatan,5.367,5.343,5.386,4.900,5.833
+126388,Sinjai,Sulawesi Selatan,5.299,5.274,5.295,5.000,5.600
+126370,Bantaeng,Sulawesi Selatan,5.525,5.505,5.544,5.100,5.900
+126371,Barru,Sulawesi Selatan,5.349,5.329,5.354,4.933,5.733
+126372,Bone,Sulawesi Selatan,5.400,5.371,5.399,5.000,5.767
+126373,Bulukumba,Sulawesi Selatan,5.421,5.398,5.418,5.100,5.700
+126374,Enrekang,Sulawesi Selatan,5.374,5.350,5.371,5.067,5.700
+126375,Gowa,Sulawesi Selatan,5.336,5.320,5.374,5.000,5.667
+126376,Jeneponto,Sulawesi Selatan,5.738,5.714,5.770,5.367,6.133
+126377,Kepulauan Selayar,Sulawesi Selatan,5.382,5.349,5.379,4.833,5.800
+126378,Kota Makassar,Sulawesi Selatan,5.678,5.679,5.775,5.333,6.100
+126379,Kota Palopo,Sulawesi Selatan,5.261,5.242,5.257,4.800,5.700
+126389,Soppeng,Sulawesi Selatan,5.513,5.482,5.507,5.167,5.867
+126392,Toraja Utara,Sulawesi Selatan,5.223,5.203,5.237,4.933,5.500
+126393,Wajo,Sulawesi Selatan,5.394,5.355,5.414,5.067,5.733
+126380,Kota Parepare,Sulawesi Selatan,5.389,5.360,5.411,5.100,5.733
+126381,Luwu,Sulawesi Selatan,5.339,5.319,5.342,4.900,5.733
+126382,Luwu Timur,Sulawesi Selatan,5.055,5.044,5.093,4.667,5.533
+126383,Luwu Utara,Sulawesi Selatan,5.140,5.126,5.166,4.733,5.600
+126384,Maros,Sulawesi Selatan,5.364,5.350,5.387,4.967,5.800
+126390,Takalar,Sulawesi Selatan,5.540,5.525,5.591,5.233,5.900
+126391,Tana Toraja,Sulawesi Selatan,5.261,5.240,5.277,4.933,5.633
+126399,Kota Palu,Sulawesi Tengah,5.571,5.549,5.579,5.100,6.267
+126400,Morowali,Sulawesi Tengah,4.976,4.961,5.006,4.600,5.400
+126401,Morowali Utara,Sulawesi Tengah,5.103,5.087,5.127,4.700,5.533
+126402,Parigi Moutong,Sulawesi Tengah,5.282,5.264,5.291,4.900,5.633
+126403,Poso,Sulawesi Tengah,5.112,5.094,5.128,4.800,5.500
+126404,Sigi,Sulawesi Tengah,5.162,5.149,5.183,4.833,5.533
+126405,Tojo Una-Una,Sulawesi Tengah,5.282,5.262,5.304,4.900,5.633
+126394,Banggai,Sulawesi Tengah,5.285,5.263,5.299,4.900,5.633
+126395,Banggai Kepulauan,Sulawesi Tengah,5.330,5.301,5.321,5.000,5.633
+126396,Banggai Laut,Sulawesi Tengah,5.256,5.224,5.256,4.800,5.633
+126398,Donggala,Sulawesi Tengah,5.055,5.043,5.087,4.667,5.433
+126407,Bombana,Sulawesi Tenggara,5.223,5.204,5.239,4.767,5.667
+126408,Buton,Sulawesi Tenggara,5.010,4.991,5.029,4.533,5.433
+126409,Buton Selatan,Sulawesi Tenggara,5.194,5.175,5.195,4.800,5.567
+126410,Buton Tengah,Sulawesi Tenggara,5.393,5.337,5.375,5.000,5.733
+126411,Buton Utara,Sulawesi Tenggara,4.971,4.957,5.007,4.600,5.333
+126412,Kolaka,Sulawesi Tenggara,5.149,5.128,5.160,4.800,5.500
+126413,Kolaka Timur,Sulawesi Tenggara,5.014,4.994,5.027,4.667,5.333
+126414,Kolaka Utara,Sulawesi Tenggara,5.041,5.026,5.069,4.700,5.433
+126415,Konawe,Sulawesi Tenggara,5.034,5.020,5.066,4.700,5.400
+126416,Konawe Kepulauan,Sulawesi Tenggara,4.934,4.920,4.972,4.533,5.333
+126417,Konawe Selatan,Sulawesi Tenggara,5.184,5.156,5.197,4.800,5.533
+126418,Konawe Utara,Sulawesi Tenggara,5.003,4.988,5.032,4.633,5.400
+126419,Kota Baubau,Sulawesi Tenggara,5.193,5.180,5.208,4.833,5.500
+126420,Kota Kendari,Sulawesi Tenggara,5.189,5.161,5.196,4.833,5.533
+126421,Muna,Sulawesi Tenggara,5.241,5.196,5.233,4.833,5.567
+126422,Muna Barat,Sulawesi Tenggara,5.488,5.421,5.454,5.100,5.800
+126423,Wakatobi,Sulawesi Tenggara,5.813,5.742,5.768,5.433,6.100
+126450,Kota Solok,Sumatera Barat,5.204,5.193,5.255,4.833,5.667
+126451,Lima Puluh Kota,Sumatera Barat,4.988,4.976,5.023,4.667,5.333
+126452,Padang Pariaman,Sumatera Barat,4.924,4.913,4.969,4.600,5.300
+126453,Pasaman,Sumatera Barat,4.988,4.977,5.042,4.633,5.367
+126454,Pasaman Barat,Sumatera Barat,5.046,5.029,5.097,4.733,5.400
+126455,Pesisir Selatan,Sumatera Barat,4.900,4.892,4.962,4.633,5.233
+126456,Sijunjung,Sumatera Barat,4.846,4.838,4.903,4.533,5.200
+146471,Solok,Sumatera Barat,4.907,4.899,4.958,4.600,5.300
+126458,Solok Selatan,Sumatera Barat,4.815,4.821,4.877,4.500,5.200
+146473,Tanah Datar,Sumatera Barat,5.083,5.070,5.117,4.767,5.433
+126440,Agam,Sumatera Barat,5.026,5.012,5.089,4.733,5.367
+126442,Dharmasraya,Sumatera Barat,4.801,4.790,4.852,4.500,5.100
+126443,Kepulauan Mentawai,Sumatera Barat,5.051,5.030,5.082,4.600,5.533
+126444,Kota Bukittinggi,Sumatera Barat,5.193,5.190,5.246,4.900,5.633
+126445,Kota Padang,Sumatera Barat,4.997,4.989,5.052,4.633,5.433
+126446,Kota Padang Panjang,Sumatera Barat,5.194,5.173,5.229,4.933,5.600
+126447,Kota Pariaman,Sumatera Barat,5.067,5.058,5.110,4.800,5.433
+126448,Kota Payakumbuh,Sumatera Barat,5.024,5.028,5.091,4.900,5.200
+126449,Kota Sawah Lunto,Sumatera Barat,4.974,4.959,5.007,4.700,5.300
+126460,Banyu Asin,Sumatera Selatan,5.043,4.980,5.037,4.700,5.333
+146465,Ogan Komering Ulu Selatan,Sumatera Selatan,5.058,5.041,5.089,4.767,5.367
+126462,Empat Lawang,Sumatera Selatan,5.033,5.016,5.061,4.700,5.400
+126463,Kota Lubuklinggau,Sumatera Selatan,4.819,4.811,4.840,4.533,5.100
+126464,Kota Pagar Alam,Sumatera Selatan,5.071,5.054,5.104,4.833,5.400
+126465,Kota Palembang,Sumatera Selatan,5.207,5.151,5.192,4.800,5.600
+126466,Kota Prabumulih,Sumatera Selatan,5.163,5.105,5.131,4.933,5.333
+126470,Musi Rawas,Sumatera Selatan,4.840,4.826,4.870,4.533,5.167
+126471,Musi Rawas Utara,Sumatera Selatan,4.845,4.825,4.869,4.567,5.133
+126472,Ogan Ilir,Sumatera Selatan,5.321,5.262,5.297,5.000,5.600
+126474,Ogan Komering Ulu,Sumatera Selatan,5.001,4.989,5.019,4.733,5.267
+126477,Penukal Abab Lematang Ilir,Sumatera Selatan,5.139,5.089,5.122,4.833,5.400
+126467,Lahat,Sumatera Selatan,4.968,4.954,4.995,4.667,5.300
+126468,Muara Enim,Sumatera Selatan,5.017,4.989,5.025,4.667,5.367
+126469,Musi Banyuasin,Sumatera Selatan,5.081,5.026,5.059,4.800,5.333
+126473,Ogan Komering Ilir,Sumatera Selatan,5.058,4.994,5.040,4.700,5.400
+126476,Ogan Komering Ulu Timur,Sumatera Selatan,5.235,5.203,5.225,4.900,5.567
+126492,Kota Tebing Tinggi,Sumatera Utara,5.448,5.437,5.536,5.133,5.833
+126498,Nias,Sumatera Utara,5.050,5.052,5.138,4.700,5.533
+126499,Nias Barat,Sumatera Utara,5.493,5.488,5.575,4.900,6.000
+126500,Nias Selatan,Sumatera Utara,5.159,5.147,5.215,4.700,5.700
+126501,Nias Utara,Sumatera Utara,5.364,5.340,5.414,4.733,6.067
+126502,Padang Lawas,Sumatera Utara,5.061,5.048,5.110,4.733,5.400
+126503,Padang Lawas Utara,Sumatera Utara,5.213,5.196,5.236,4.900,5.533
+126504,Pakpak Bharat,Sumatera Utara,4.979,4.960,5.028,4.733,5.300
+126506,Serdang Bedagai,Sumatera Utara,5.312,5.294,5.369,5.000,5.800
+146470,Simalungun,Sumatera Utara,5.063,5.044,5.078,4.800,5.333
+126508,Tapanuli Selatan,Sumatera Utara,5.041,5.026,5.092,4.733,5.433
+146476,Tapanuli Tengah,Sumatera Utara,5.140,5.122,5.178,4.767,5.600
+146478,Toba Samosir,Sumatera Utara,5.077,5.058,5.112,4.767,5.400
+146468,Samosir,Sumatera Utara,5.135,5.117,5.160,4.867,5.467
+146460,Humbang Hasundutan,Sumatera Utara,4.989,4.973,5.026,4.700,5.300
+146477,Tapanuli Utara,Sumatera Utara,5.009,4.997,5.035,4.733,5.300
+126479,Batu Bara,Sumatera Utara,5.352,5.334,5.448,4.967,5.767
+146458,Dairi,Sumatera Utara,5.149,5.126,5.180,4.833,5.533
+126482,Deli Serdang,Sumatera Utara,5.353,5.337,5.409,4.933,5.933
+146461,Karo,Sumatera Utara,5.199,5.178,5.233,4.833,5.633
+126485,Kota Binjai,Sumatera Utara,5.443,5.427,5.504,5.067,6.000
+126486,Kota Gunungsitoli,Sumatera Utara,5.003,5.008,5.087,4.667,5.333
+126487,Kota Medan,Sumatera Utara,6.079,6.081,6.169,5.533,6.600
+126488,Kota Padangsidimpuan,Sumatera Utara,5.155,5.144,5.204,4.900,5.500
+126489,Kota Pematang Siantar,Sumatera Utara,5.261,5.246,5.294,4.933,5.633
+126490,Kota Sibolga,Sumatera Utara,5.320,5.312,5.381,4.933,5.800
+126491,Kota Tanjung Balai,Sumatera Utara,5.006,4.990,5.104,4.833,5.333
+126478,Asahan,Sumatera Utara,4.992,4.971,5.031,4.733,5.267
+126493,Labuhan Batu,Sumatera Utara,5.100,5.080,5.140,4.800,5.400
+126494,Labuhan Batu Selatan,Sumatera Utara,5.040,5.016,5.059,4.767,5.300
+126495,Labuhan Batu Utara,Sumatera Utara,5.041,5.022,5.081,4.733,5.400
+126496,Langkat,Sumatera Utara,5.173,5.149,5.208,4.733,5.633
+126497,Mandailing Natal,Sumatera Utara,4.924,4.915,5.000,4.633,5.300
+126339,Fakfak,Papua Barat,4.997,4.961,4.995,4.667,5.333
+126340,Kaimana,Papua Barat,5.038,5.021,5.067,4.633,5.433
+126343,Manokwari Selatan,Papua Barat,5.129,5.111,5.139,4.733,5.500
+126345,Pegunungan Arfak,Papua Barat,5.088,5.071,5.108,4.800,5.400
+126350,Teluk Bintuni,Papua Barat,5.082,5.062,5.098,4.667,5.433
+126351,Teluk Wondama,Papua Barat,4.834,4.822,4.875,4.467,5.233
+126342,Manokwari,Papua Barat,5.338,5.328,5.358,4.933,5.700
+126344,Maybrat,Papua Barat Daya,4.950,4.937,4.960,4.567,5.300
+126346,Raja Ampat,Papua Barat Daya,5.009,4.986,5.032,4.500,5.533
+126347,Sorong,Papua Barat Daya,5.127,5.104,5.145,4.600,5.633
+126349,Tambrauw,Papua Barat Daya,5.063,5.046,5.085,4.733,5.433
+126341,Kota Sorong,Papua Barat Daya,5.046,5.027,5.088,4.700,5.467
+126348,Sorong Selatan,Papua Barat Daya,5.162,5.134,5.167,4.733,5.633
+126311,Biak Numfor,Papua,5.154,5.120,5.145,4.667,5.633
+126326,Mimika,Papua Tengah,5.125,5.109,5.174,4.800,5.533
+126327,Nabire,Papua Tengah,4.896,4.889,4.937,4.533,5.300
+126051,Boalemo,Gorontalo,5.228,5.203,5.235,4.800,5.633
+126052,Bone Bolango,Gorontalo,5.179,5.166,5.199,4.800,5.633
+126053,Gorontalo,Gorontalo,5.376,5.357,5.384,4.933,5.800
+126054,Gorontalo Utara,Gorontalo,5.245,5.226,5.258,4.833,5.633
+126055,Kota Gorontalo,Gorontalo,5.590,5.579,5.625,4.967,6.200
+126056,Pohuwato,Gorontalo,5.097,5.083,5.123,4.700,5.533
+126180,Mempawah,Kalimantan Barat,5.002,4.970,5.029,4.633,5.333
+126181,Sambas,Kalimantan Barat,4.930,4.907,4.956,4.567,5.333
+126171,Bengkayang,Kalimantan Barat,4.887,4.870,4.918,4.600,5.267
+126172,Kapuas Hulu,Kalimantan Barat,4.788,4.779,4.853,4.433,5.200
+126176,Kota Singkawang,Kalimantan Barat,4.923,4.893,4.941,4.567,5.300
+126218,Kutai Timur,Kalimantan Timur,5.005,4.977,5.014,4.633,5.300
+126212,Berau,Kalimantan Timur,4.929,4.910,4.963,4.567,5.300
+126214,Kota Bontang,Kalimantan Timur,5.224,5.193,5.211,4.867,5.600
+126222,Bulungan,Kalimantan Utara,4.972,4.957,5.025,4.533,5.433
+126223,Kota Tarakan,Kalimantan Utara,5.091,5.071,5.144,4.800,5.467
+126224,Malinau,Kalimantan Utara,4.935,4.910,4.966,4.667,5.233
+126225,Nunukan,Kalimantan Utara,5.032,5.011,5.075,4.733,5.367
+126226,Tana Tidung,Kalimantan Utara,5.096,5.081,5.170,4.600,5.800
+126234,Bintan,Kepulauan Riau,5.060,5.035,5.061,4.633,5.467
+126235,Karimun,Kepulauan Riau,5.138,5.110,5.144,4.667,5.633
+126236,Kepulauan Anambas,Kepulauan Riau,5.200,5.188,5.273,4.700,5.967
+126237,Kota Batam,Kepulauan Riau,5.273,5.250,5.290,4.800,5.833
+126238,Kota Tanjung Pinang,Kepulauan Riau,4.976,4.951,4.955,4.633,5.300
+126240,Natuna,Kepulauan Riau,5.170,5.143,5.177,4.767,5.533
+126268,Halmahera Barat,Maluku Utara,5.146,5.130,5.169,4.700,5.633
+126271,Halmahera Timur,Maluku Utara,5.039,5.033,5.081,4.700,5.433
+126272,Halmahera Utara,Maluku Utara,5.152,5.129,5.161,4.733,5.567
+126274,Kota Ternate,Maluku Utara,5.188,5.176,5.216,4.733,5.667
+126276,Pulau Morotai,Maluku Utara,5.093,5.076,5.116,4.667,5.533
+126352,Bengkalis,Riau,5.093,5.054,5.093,4.767,5.400
+126356,Kepulauan Meranti,Riau,5.041,5.005,5.060,4.800,5.267
+126357,Kota Dumai,Riau,5.107,5.067,5.099,4.800,5.400
+126358,Kota Pekanbaru,Riau,5.258,5.229,5.246,4.967,5.600
+126363,Siak,Riau,5.071,5.031,5.067,4.800,5.300
+126406,Toli-Toli,Sulawesi Tengah,5.123,5.109,5.147,4.767,5.500
+126397,Buol,Sulawesi Tengah,5.115,5.100,5.139,4.733,5.500
+126424,Bolaang Mongondow,Sulawesi Utara,5.243,5.222,5.261,4.900,5.600
+126425,Bolaang Mongondow Selatan,Sulawesi Utara,5.088,5.069,5.102,4.633,5.600
+146455,Bolaang Mongondow Timur,Sulawesi Utara,5.227,5.206,5.234,4.800,5.600
+126427,Bolaang Mongondow Utara,Sulawesi Utara,5.258,5.239,5.282,4.867,5.700
+126429,Kepulauan Sangihe,Sulawesi Utara,5.017,5.001,5.041,4.667,5.400
+126430,Kepulauan Talaud,Sulawesi Utara,5.135,5.125,5.161,4.467,5.800
+126431,Kota Bitung,Sulawesi Utara,5.077,5.057,5.098,4.733,5.467
+126432,Kota Kotamobagu,Sulawesi Utara,5.428,5.408,5.466,5.067,5.800
+126433,Kota Manado,Sulawesi Utara,5.223,5.213,5.274,4.933,5.600
+126435,Minahasa,Sulawesi Utara,5.184,5.160,5.192,4.900,5.500
+126434,Kota Tomohon,Sulawesi Utara,5.244,5.219,5.262,4.900,5.600
+126437,Minahasa Tenggara,Sulawesi Utara,5.094,5.068,5.092,4.800,5.433
+126438,Minahasa Utara,Sulawesi Utara,5.183,5.162,5.194,4.833,5.533
+126439,Siau Tagulandang Biaro,Sulawesi Utara,4.962,4.957,5.011,4.600,5.500
+126436,Minahasa Selatan,Sulawesi Utara,5.176,5.153,5.191,4.833,5.500
+126334,Supiori,Papua,4.640,4.633,4.677,4.300,5.100
+126318,Keerom,Papua,4.978,4.963,5.005,4.633,5.333
+126336,Waropen,Papua,4.913,4.902,4.948,4.600,5.233
+126333,Sarmi,Papua,5.142,5.127,5.163,4.700,5.600
+126316,Jayapura,Papua,5.066,5.055,5.099,4.700,5.433
+126319,Kepulauan Yapen,Papua,4.780,4.768,4.831,4.400,5.233
+126320,Kota Jayapura,Papua,5.066,5.051,5.094,4.700,5.400
+126322,Mamberamo Raya,Papua,5.013,5.000,5.055,4.633,5.433
+126321,Lanny Jaya,Papua Pegunungan,5.247,5.224,5.264,5.000,5.500
+126317,Jayawijaya,Papua Pegunungan,5.231,5.208,5.236,5.000,5.500
+126330,Pegunungan Bintang,Papua Pegunungan,4.926,4.914,4.959,4.533,5.400
+126323,Mamberamo Tengah,Papua Pegunungan,5.067,5.049,5.096,4.733,5.400
+126328,Nduga,Papua Pegunungan,5.171,5.151,5.186,4.800,5.600
+126335,Tolikara,Papua Pegunungan,4.993,4.973,5.010,4.633,5.333
+126337,Yahukimo,Papua Pegunungan,5.122,5.105,5.157,4.733,5.533
+126338,Yalimo,Papua Pegunungan,5.053,5.039,5.092,4.700,5.400
+126310,Asmat,Papua Selatan,4.940,4.905,4.975,4.667,5.267
+126312,Boven Digoel,Papua Selatan,4.951,4.928,4.972,4.633,5.300
+126324,Mappi,Papua Selatan,5.019,4.979,5.018,4.700,5.333
+126325,Merauke,Papua Selatan,5.493,5.428,5.460,5.067,5.900
+126313,Deiyai,Papua Tengah,5.164,5.139,5.176,4.833,5.500
+126314,Dogiyai,Papua Tengah,5.152,5.130,5.159,4.800,5.533
+126315,Intan Jaya,Papua Tengah,4.940,4.920,4.968,4.633,5.233
+126329,Paniai,Papua Tengah,5.019,4.998,5.035,4.700,5.300
+126331,Puncak,Papua Tengah,5.019,5.001,5.051,4.700,5.333
+126332,Puncak Jaya,Papua Tengah,4.910,4.891,4.938,4.600,5.267

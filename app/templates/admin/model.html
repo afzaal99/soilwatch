@@ -41,7 +41,7 @@
   </div>
 </div>
 
-<div class="adm-grid">
+<div class="adm-grid rata">
   <section class="card adm-card">
     <h2 class="adm-h">Latih ulang model</h2>
     <ol class="how adm-how rapat">
@@ -70,6 +70,7 @@
       dilatih ({{ siap.akhir_latih }}). Saat ini ada {{ siap.n_baru }} bulan. Tambahkan data lewat menu
       <a href="{{ url_for('admin.unggah') }}">Unggah Data</a>.</p>
     {% endif %}
+    <div class="adm-dorong" aria-hidden="true"></div>
     <form method="post" action="{{ url_for('admin.model_latih') }}" class="adm-aksi" id="f-latih">
       <input type="hidden" name="csrf" value="{{ csrf_token() }}">
       <button class="btn p sm" type="submit" id="b-latih" {{ 'disabled' if jalan or not siap.siap }}>

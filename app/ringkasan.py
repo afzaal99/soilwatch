@@ -8,6 +8,7 @@ terbarui otomatis ketika data bulan baru ditambahkan.
 Catatan: ringkasan memakai nilai ACUAN SMAP L4, bukan hasil prediksi model.
 """
 import estimasi as est
+import ph_tanah
 
 BULAN = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus",
          "September", "Oktober", "November", "Desember"]
@@ -247,12 +248,23 @@ def csv_wilayah(wid):
     sm = est.sm_wilayah(wid)
     kol = (["periode", "bulan", "kabupaten_kota", "provinsi",
             f"soil_moisture_smap_{nm}_m3m3", f"estimasi_model_{nm}_m3m3"] + est.FITUR)
+    ph = ph_tanah.info(w)
+    if ph:                                                   # pH tanah: satu nilai per wilayah (statis)
+        kol += ["ph_tanah_0_30cm", "kelas_ph"]
+        tambah = [_angka(ph["ph"], 2), ph["kelas"]]
+    else:
+        tambah = []
+    lap = {b["periode"]: b for b in ph_tanah.data_lapangan().get(ph_tanah._kunci(w["label"], w["prov"]), [])}
+    if lap:                                                  # pH hasil uji tanah lapangan (bulanan, dari admin)
+        kol += ["ph_uji_lapangan", "sumber_uji_lapangan"]
     baris = [";".join(kol)]
     for i, kode in enumerate(est.DATA["periode"]):
         x = est.nilai_wilayah(wid, kode)
         pred = est.prediksi(x, w["kelompok"])[0] if all(v is not None for v in x.values()) else None
         baris.append(";".join(_waktu(kode) + [w["label"], w["prov"], _angka(sm[i]), _angka(pred)]
-                              + [_angka(x.get(f)) for f in est.FITUR]))
+                              + [_angka(x.get(f)) for f in est.FITUR] + tambah
+                              + ([_angka(lap[kode]["ph"], 2), lap[kode]["sumber"]] if kode in lap
+                                 else ["", ""] if lap else [])))
     return "\ufeff" + "\r\n".join(baris) + "\r\n"
 
 
@@ -314,12 +326,17 @@ def csv_semua(jenis="bulanan", tahun=None):
         ths = tahun_tersedia()
         jml = {t: sum(1 for p in per if p.startswith(t)) for t in ths}
         kol = [f"rata_rata_{t}_m3m3" + ("" if jml[t] == 12 else f"_{jml[t]}_bulan") for t in ths]
-        baris = [";".join(["kabupaten_kota", "provinsi", "kelompok_wilayah"] + kol)]
+        ada_ph = ph_tanah.tersedia()
+        baris = [";".join(["kabupaten_kota", "provinsi", "kelompok_wilayah"] + kol
+                          + (["ph_tanah_0_30cm", "kelas_ph"] if ada_ph else []))]
         for w in est.WILAYAH:
             nilai = []
             for t in ths:
                 v = [sm[w["id"]][i] for i, p in enumerate(per) if p.startswith(t) and sm[w["id"]][i] is not None]
                 nilai.append(_angka(sum(v) / len(v)) if v else "")
+            if ada_ph:
+                ph = ph_tanah.info(w)
+                nilai += [_angka(ph["ph"], 2), ph["kelas"]] if ph else ["", ""]
             baris.append(";".join([w["label"], w["prov"], w["kelompok"]] + nilai))
     else:
         baris = ["periode;bulan;kabupaten_kota;provinsi;kelompok_wilayah;soil_moisture_smap_m3m3"]

@@ -37,3 +37,10 @@ desktop.ini
 # Model Random Forest nasional (107 MB, melebihi batas GitHub 100 MB).
 # Tidak dipakai aplikasi karena bobot RF = 0 (model terpilih XGBoost). Cadangan disimpan di Google Drive.
 models/rf_nasional.joblib
+
+app/data/ph_lapangan*.csv
+manual/
+reports/manual_book/
+reports/tangkapan_layar/
+reports/*.pptx
+reports/*.docx

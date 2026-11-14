@@ -100,6 +100,7 @@ def main():
             continue
         gambut[k] = gambut.get(k, 0) + ha / 100          # hektar -> km2
 
+    # melakukan pengecekan wilayah
     total = t["peatland_area_hectares"].sum() / 100
     hilang = sum(ha for _, ha in tak_cocok) / 100
     print(f"Total gambut Trase: {total:,.0f} km2; tercocokkan: {total - hilang:,.0f} km2 "
@@ -114,7 +115,7 @@ def main():
     for a, b in zip(wil["ADM2_NAME"], wil["ADM1_NAME"]):
         g, l = gambut.get((a, b), 0.0), luas.get((a, b), float("nan"))
         rinci.append({"ADM2_NAME": a, "ADM1_NAME": b, "luas_wilayah_km2": l, "luas_gambut_km2": g,
-                      "prop_gambut": min(g / l, 1.0) if l else 0.0})
+                      "prop_gambut": min(g / l, 1.0) if l else 0.0}) # klo ada gambut yg nilainya diatas 1, di cut jadi 1
     rinci = pd.DataFrame(rinci)
     rinci["penanda_gambut"] = (rinci["prop_gambut"] >= AMBANG).astype(int)
     lebih = rinci[rinci["luas_gambut_km2"] > 1.05 * rinci["luas_wilayah_km2"]]
@@ -124,6 +125,7 @@ def main():
     rinci.sort_values("prop_gambut", ascending=False).round(4).to_csv(
         REPORTS / "02b_gambut_per_wilayah.csv", index=False)
 
+    # menggabungkan file penanda dengan file gambut
     p = pd.read_csv(PENANDA).drop(columns=["prop_gambut", "penanda_gambut"], errors="ignore")
     p = p.merge(rinci[["ADM2_NAME", "ADM1_NAME", "prop_gambut", "penanda_gambut"]],
                 on=["ADM2_NAME", "ADM1_NAME"], how="left")

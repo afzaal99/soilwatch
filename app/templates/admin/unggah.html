@@ -15,8 +15,8 @@
   </ol>
 </div>
 
-<div class="adm-grid unggah">
-  <section class="card adm-card">
+<div class="adm-grid unggah rata">
+  <section class="card adm-card adm-isi-tumbuh">
     <h2 class="adm-h">Pilih berkas CSV</h2>
     <form method="post" enctype="multipart/form-data" id="f-unggah">
       <input type="hidden" name="csrf" value="{{ csrf_token() }}">
@@ -33,7 +33,7 @@
       <ul class="adm-cek">
         <li>Kolom lengkap dan {{ jumlah_wilayah }} kabupaten/kota sesuai batas wilayah data latih</li>
         <li>Bulan menyambung dengan data terakhir ({{ jadwal.data_akhir }}), tanpa bulan terlewat</li>
-        <li>Nilai di dalam batas fisik; artefak dan nilai kosong dibersihkan dengan aturan yang sama seperti data latih</li>
+        <li>Nilai di dalam batas fisik; nilai tidak wajar dan nilai kosong dibersihkan dengan aturan yang sama seperti data latih</li>
         <li>Akurasi model pada bulan baru dibanding nilai acuan SMAP L4</li>
       </ul>
       Data belum disimpan sampai Anda menekan tombol <b>Simpan</b> di halaman berikutnya.
@@ -82,18 +82,27 @@
         lalu unggah di kotak sebelah kiri.</span></li>
     </ol>
 
-    <h3 class="adm-h3">Kapan data sebulan dianggap lengkap?</h3>
-    <table class="src">
+  </section>
+</div>
+
+<section class="card adm-card adm-lebar">
+  <h2 class="adm-h">Kapan data sebulan dianggap lengkap?</h2>
+  <div class="adm-dua">
+    <div class="adm-tabel-wrap">
+      <table class="src">
       <tr><th>Sumber</th><th>Variabel</th><th>Data lengkap</th></tr>
       {% for s, v, t in sumber %}<tr><td>{{ s }}</td><td>{{ v }}</td><td>{{ t }}</td></tr>{% endfor %}
     </table>
-    <p class="muted small-2 adm-p">Karena curah hujan CHIRPS paling lambat tersedia, data bulan apa pun baru aman diunggah
+    </div>
+    <div class="adm-dua-catatan">
+    <p class="note">Karena curah hujan CHIRPS paling lambat tersedia, data bulan apa pun baru aman diunggah
       <b>mulai tanggal 25 bulan berikutnya</b>. Contoh: data Oktober aman diunggah mulai 25 November.</p>
-    <p class="muted small-2 adm-p">Produksi CHIRPS versi 2 dijadwalkan berjalan paralel dengan versi 3 hingga akhir 2026.
+    <p class="note">Produksi CHIRPS versi 2 dijadwalkan berjalan paralel dengan versi 3 hingga akhir 2026.
       Jika curah hujan pada berkas kosong, kemungkinan versi 2 sudah dihentikan: sumber curah hujan perlu diganti ke
       CHIRPS versi 3, seluruh data diekstrak ulang, dan model dilatih ulang.</p>
-  </section>
-</div>
+    </div>
+  </div>
+</section>
 
 <script>
 (function () {

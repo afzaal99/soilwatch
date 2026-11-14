@@ -53,7 +53,7 @@
   </div>
 </div>
 
-<div class="adm-grid">
+<div class="adm-grid rata dash">
   <section class="card adm-card">
     <div class="card-h wrap">
       <div>
@@ -92,14 +92,15 @@
   </section>
 
   <div class="adm-kolom">
-    <section class="card adm-card">
-      <div class="card-h"><h2>Riwayat aktivitas</h2></div>
+    <section class="card adm-card adm-riwayat-card">
+      <div class="card-h"><h2>Riwayat aktivitas</h2>
+        {% if n_riwayat %}<a class="link-more" href="{{ url_for('admin.riwayat') }}">Lihat riwayat lengkap ({{ n_riwayat }})</a>{% endif %}</div>
       {% if riwayat %}
       <ul class="adm-riwayat">
         {% for r in riwayat %}
         <li>
           <span class="adm-titik {{ 'pulih' if r.jenis == 'Pemulihan' }}" aria-hidden="true"></span>
-          <div><b>{{ r.jenis }}</b> <span class="muted small">· {{ r.waktu_teks }}</span>
+          <div><b>{{ 'Data pH' if r.jenis == 'ph' else r.jenis }}</b> <span class="muted small">· {{ r.waktu_teks }}</span>
             <p>{{ r.keterangan }}</p>
             {% if r.berkas %}<span class="muted small">Berkas: {{ r.berkas }}</span>{% endif %}</div>
         </li>
@@ -121,6 +122,7 @@
         {% if latih.siap %}Sudah ada {{ latih.n_baru }} bulan data baru, jadi model bisa dilatih ulang dan dibandingkan
         dengan model aktif.{% else %}Latih ulang tersedia setelah ada minimal {{ latih.perlu }} bulan data baru
         (sekarang {{ latih.n_baru }}).{% endif %}</p>
+      <div class="adm-dorong" aria-hidden="true"></div>
       <a class="btn {{ 'p' if (latih.siap or kand) else 'g' }} sm" href="{{ url_for('admin.model') }}">{{ 'Lihat hasil perbandingan' if kand and not kand.sudah_dipasang else 'Kelola model' }}</a>
     </section>
   </div>

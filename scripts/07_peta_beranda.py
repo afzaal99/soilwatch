@@ -4,7 +4,6 @@
 Mewarnai setiap kabupaten/kota dengan soil moisture SMAP L4 bulan terbaru di dataset.
 
 Batas wilayah: FAO GAUL 2025 (data/geo/batas_kabkota_gaul2025.geojson, hasil script 02)
-jika sudah ada; jika belum, batas pratinjau GADM lama (lihat scripts/peta.py).
 
 Keluaran: app/static/img/peta_beranda.svg, app/static/data/ringkasan_beranda.json
 

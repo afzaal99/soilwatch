@@ -160,6 +160,8 @@
     if (p) { p.classList.add('pilih'); lapisan.appendChild(p); }
     isiPanel();
   }
+  const WARNA_PH = { 'sangat masam': '#B91C1C', 'masam': '#EA580C', 'agak masam': '#CA8A04',
+                     'netral': '#15803D', 'agak alkalis': '#0E7490', 'alkalis': '#1D4ED8' };
   function isiPanel() {
     const [nama, prov, danau] = D.wilayah[pilih];
     const [g, a, t] = D.penanda[pilih];
@@ -176,6 +178,13 @@
       document.getElementById('v-' + k).textContent = n + ' %';
       document.getElementById('b-' + k).style.width = Math.max(n, 1) + '%';
     });
+    const rPh = document.getElementById('r-ph');
+    const ph = D.ph && D.ph[pilih];
+    rPh.hidden = !ph;
+    if (ph) {
+      document.getElementById('v-ph').textContent = `${String(ph[0]).replace('.', ',')} · ${ph[1]}`;
+      document.getElementById('s-ph').style.background = WARNA_PH[ph[1]] || '#94A3B8';
+    }
     const tanda = [g >= AMBANG && 'gambut', a >= AMBANG && 'badan air'].filter(Boolean);
     let cat = tanda.length
       ? `Wilayah ini <b>ditandai</b> sebagai wilayah ${tanda.join(' dan ')}. Hasil estimasi perlu ditafsirkan dengan hati-hati.`

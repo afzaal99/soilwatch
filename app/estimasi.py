@@ -16,6 +16,8 @@ import sqlite3
 from functools import lru_cache
 from pathlib import Path
 
+import ph_tanah   # fitur tambahan pH tanah (tidak memengaruhi model)
+
 ROOT = Path(__file__).resolve().parents[1]
 DB = Path(__file__).parent / "data" / "soilwatch.db"
 if not DB.exists():
@@ -106,8 +108,9 @@ def muat_ulang():
     FITUR, STAT, WILAYAH = DATA["fitur"], DATA["stat"], DATA["wilayah"]
     ID_PERIODE = {p: i for i, p in enumerate(DATA["periode"])}
     KONF = _baca_konfigurasi()
-    for fn in (_model, _penjelas_rf, data_peta):
+    for fn in (_model, _penjelas_rf, data_peta, estimasi_wilayah, metrik_semua_model):
         fn.cache_clear()
+    ph_tanah.muat_ulang()
     VERSI = _versi()
 
 
@@ -316,7 +319,8 @@ def data_peta():
         sm[wid][pid] = None if v is None else round(v, 3)
     return {"periode": DATA["periode"], "periode_label": DATA["periode_label"],
             "wilayah": [[w["label"], w["prov"], w["danau"]] for w in WILAYAH], "sm": sm,
-            "penanda": DATA["penanda"], "penanda_contoh": DATA["penanda_contoh"]}
+            "penanda": DATA["penanda"], "penanda_contoh": DATA["penanda_contoh"],
+            "ph": ph_tanah.ringkas_semua(WILAYAH)}
 
 
 BULAN_PANJANG = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September",
@@ -385,3 +389,183 @@ def tren(wid, pilih):
             "titik": titik, "rendah": teks(rendah), "tinggi": teks(tinggi),
             "centang": centang, "titik_bulan": titik_bulan,
             "awal": DATA["periode_label"][0], "akhir": DATA["periode_label"][-1]}
+
+
+
+# ----------------------------------------------------------------------------- aktual vs estimasi per wilayah
+@lru_cache(maxsize=128)
+def estimasi_wilayah(wid):
+    """Estimasi model untuk setiap bulan suatu wilayah (urut periode; None jika data variabel tidak lengkap).
+    Dihitung sekaligus (satu panggilan predict per model) dengan model yang sama seperti halaman hasil."""
+    n = len(DATA["periode"])
+    baris = _query(f"SELECT periode_id, {', '.join(FITUR)} FROM data_bulanan WHERE wilayah_id = ? "
+                   "ORDER BY periode_id", (wid,))
+    lengkap = [(pid, dict(zip(FITUR, r))) for pid, *r in baris if all(v is not None for v in r)]
+    hasil = [None] * n
+    if not lengkap:
+        return tuple(hasil)
+    cak, rencana = _rencana(WILAYAH[wid]["kelompok"])
+    try:
+        import pandas as pd
+        total = None
+        for jenis, bobot in rencana:
+            obj = _model(jenis, cak)
+            if obj is None:
+                raise LookupError
+            X = pd.DataFrame([[x[f] for f in obj["fitur"]] for _, x in lengkap], columns=obj["fitur"])
+            p = bobot * obj["model"].predict(X).astype(float)
+            total = p if total is None else total + p
+        for (pid, _), v in zip(lengkap, total):
+            hasil[pid] = float(v)
+    except Exception:
+        for pid, x in lengkap:                       # cadangan: satu per satu (termasuk model contoh)
+            hasil[pid] = prediksi(x, WILAYAH[wid]["kelompok"])[0]
+    return tuple(hasil)
+
+
+AKHIR_LATIH_SKRIPSI = "2025-09"   # data latih skripsi: Januari 2023 - September 2025 (scripts/config.py)
+
+
+def akhir_data_latih():
+    """Bulan terakhir yang dipakai melatih model aktif ('YYYY-MM')."""
+    k = KONF or {}
+    if k.get("data_latih_sampai"):                 # diisi saat model dilatih ulang lewat Dashboard Admin
+        return str(k["data_latih_sampai"])[:7]
+    return AKHIR_LATIH_SKRIPSI
+
+
+def banding(wid, pilih):
+    """Grafik perbandingan nilai aktual (SMAP L4) dan estimasi model suatu wilayah, per bulan,
+    beserta selisihnya. Koordinat SVG sudah dihitung agar template cukup menggambar."""
+    sm = sm_wilayah(wid)
+    es = estimasi_wilayah(wid)
+    per = DATA["periode"]
+    n = len(per)
+    ip = ID_PERIODE[pilih]
+    batas = akhir_data_latih()
+    latih = [p <= batas for p in per]
+
+    W, L, R = 1000, 40, 12
+    T, H1 = 14, 196            # panel atas: garis aktual dan estimasi
+    T2, H2 = 236, 300          # panel bawah: batang selisih (estimasi - aktual)
+    H, B = 326, 26
+    vals = [v for v in sm + list(es) if v is not None]
+    lo = math.floor(min(vals) * 20) / 20
+    hi = math.ceil(max(vals) * 20) / 20
+    if hi - lo < 0.1:
+        hi = lo + 0.1
+    X = lambda i: L + i * (W - L - R) / (n - 1)
+    Y = lambda v: T + (hi - v) / (hi - lo) * (H1 - T)
+
+    sel = [None if a is None or e is None else e - a for a, e in zip(sm, es)]
+    smax = max([abs(d) for d in sel if d is not None] + [0.01])
+    smax = math.ceil(smax * 100) / 100                     # skala batang: kelipatan 0,01
+    tengah = (T2 + H2) / 2
+    Ys = lambda d: tengah - d / smax * (H2 - T2) / 2
+
+    def garis(seri):
+        return " ".join(f"{X(i):.1f},{Y(v):.1f}" for i, v in enumerate(seri) if v is not None)
+
+    pita = ""                                              # area antara kedua garis (besar selisih)
+    if all(v is not None for v in sm) and all(v is not None for v in es):
+        pita = " ".join([f"{X(i):.1f},{Y(v):.1f}" for i, v in enumerate(sm)] +
+                        [f"{X(i):.1f},{Y(v):.1f}" for i, v in reversed(list(enumerate(es)))])
+
+    gy, v = [], lo
+    while v <= hi + 1e-9:
+        gy.append({"y": Y(v), "teks": fmt(v, 2)})
+        v += 0.05 if hi - lo <= 0.3 else 0.1
+    centang, gx, _ = sumbu_bulan(X, Y, sm, setiap=3)
+    lebar = (W - L - R) / (n - 1)
+    batang, titik = [], []
+    for i in range(n):
+        if sel[i] is not None:
+            y0, y1 = sorted([tengah, Ys(sel[i])])
+            batang.append({"x": X(i) - lebar * 0.32, "w": lebar * 0.64, "y": y0, "h": max(y1 - y0, 0.8),
+                           "naik": sel[i] >= 0, "latih": latih[i], "pilih": i == ip})
+        if sm[i] is not None and es[i] is not None:
+            titik.append({"x": X(i), "y": (Y(sm[i]) + Y(es[i])) / 2,
+                          "teks": f"{DATA['periode_label'][i]} · aktual {fmt(sm[i], 3)} · estimasi {fmt(es[i], 3)}"
+                                  f" · selisih {'+' if sel[i] >= 0 else '−'}{fmt(abs(sel[i]), 3)}"})
+
+    n_latih = sum(latih)
+    x_batas = X(n_latih - 1) + lebar / 2 if 0 < n_latih < n else None
+    luar = [abs(d) for d, l in zip(sel, latih) if d is not None and not l]
+    dalam = [abs(d) for d, l in zip(sel, latih) if d is not None and l]
+    terbesar = max(((abs(d), i) for i, d in enumerate(sel) if d is not None and not latih[i]), default=None)
+    a, e, d = sm[ip], es[ip], sel[ip]
+    return {
+        "W": W, "H": H, "L": L, "R": R, "B": B, "T": T, "H1": H1, "T2": T2, "H2": H2, "tengah": tengah,
+        "gy": gy, "gx": gx, "centang": centang, "aktual": garis(sm), "estimasi": garis(es), "pita": pita,
+        "batang": batang, "titik_bulan": titik, "smax": fmt(smax, 2),
+        "x_batas": x_batas, "x_awal": L, "x_akhir": W - R,
+        "pilih": {"x": X(ip), "ya": None if a is None else Y(a), "ye": None if e is None else Y(e),
+                  "label": DATA["periode_label"][ip]},
+        "bulan": {"aktual": a, "estimasi": e, "selisih": d,
+                  "persen": None if not a or d is None else 100 * d / a, "latih": latih[ip]},
+        "mae_luar": sum(luar) / len(luar) if luar else None, "n_luar": len(luar),
+        "mae_dalam": sum(dalam) / len(dalam) if dalam else None,
+        "terbesar": None if terbesar is None else {"nilai": terbesar[0], "label": DATA["periode_label"][terbesar[1]]},
+        "akhir_latih": label_bulan(batas),
+        "semua_latih": n_latih == n,
+    }
+
+
+# ----------------------------------------------------------------------------- 16 model hasil pelatihan
+KELOMPOK_URUT = ["Sumatera", "Jawa", "Bali-Nusa Tenggara", "Kalimantan", "Sulawesi", "Maluku", "Papua"]
+
+
+def _metrik_dari_laporan():
+    """Cadangan bila model_terpilih.json belum memuat metrik_semua_model: baca reports/03_ dan 04_evaluasi."""
+    import csv
+    hasil = {}
+    for jenis, berkas in [("rf", "03_evaluasi_rf.csv"), ("xgb", "04_evaluasi_xgb.csv")]:
+        f = ROOT / "reports" / berkas
+        if not f.exists():
+            return None
+        for r in csv.DictReader(f.open(encoding="utf-8")):
+            sken = r["model"].split()[-1]
+            if (sken == "nasional" and r["dievaluasi_pada"] == "Indonesia") or sken == "regional":
+                cak = "nasional" if sken == "nasional" else r["dievaluasi_pada"]
+                hasil.setdefault(jenis, {})[cak] = {k: round(float(r[k]), 4) for k in ("R2", "MAE", "RMSE")}
+    return hasil
+
+
+@lru_cache(maxsize=1)
+def metrik_semua_model():
+    """Akurasi data uji 16 model yang dilatih (RF dan XGBoost; 1 nasional + 7 regional), dan model mana
+    yang dipakai aplikasi. Model nasional diuji pada seluruh Indonesia, model regional pada kelompoknya."""
+    k = KONF or {}
+    m = k.get("metrik_semua_model") or _metrik_dari_laporan()
+    if not m:
+        return None
+    dipakai = {}
+    for kel in KELOMPOK_URUT:
+        cak, rencana = _rencana(kel)
+        for jenis, _ in rencana:
+            dipakai.setdefault((jenis, cak), []).append(kel)
+    baris = []
+    for cak in ["nasional"] + KELOMPOK_URUT:
+        sel = {}
+        for jenis in ("rf", "xgb"):
+            d = (m.get(jenis) or {}).get(cak)
+            sel[jenis] = None if d is None else {**d, "dipakai": dipakai.get((jenis, cak), [])}
+        baris.append({"cakupan": cak, "nama": "Nasional" if cak == "nasional" else cak.replace("-", "–"),
+                      "ket": "seluruh Indonesia" if cak == "nasional" else "regional", **sel})
+    pakai = [{"model": f"{NAMA_JENIS[j]} {'nasional' if c == 'nasional' else 'regional ' + c.replace('-', '–')}",
+              "untuk": [x.replace("-", "–") for x in kel]} for (j, c), kel in dipakai.items()]
+    pakai.sort(key=lambda p: (-len(p["untuk"]), p["model"]))
+    aturan = k.get("aturan_10_persen")
+    if not aturan:                                          # cadangan: hasil script 05
+        f = ROOT / "reports" / "05_nasional_vs_regional.csv"
+        if f.exists():
+            import csv
+            aturan = [{"kelompok": r["kelompok"], "rmse_nasional": float(r["rmse_nasional"]),
+                       "rmse_regional": float(r["rmse_regional"]), "selisih_persen": float(r["selisih_%"]),
+                       "dipakai": r["model_dipakai"]} for r in csv.DictReader(f.open(encoding="utf-8"))]
+    urut = {kel: i for i, kel in enumerate(KELOMPOK_URUT)}
+    aturan = sorted([{**a, "nama": a["kelompok"].replace("-", "–")} for a in (aturan or [])],
+                    key=lambda a: urut.get(a["kelompok"], 99))
+    return {"baris": baris, "pakai": pakai, "aturan": aturan,
+            "sumber_awal": bool(k.get("dilatih_ulang")),
+            "periode_uji": (k.get("metrik_awal_skripsi") or {}).get("periode_uji") or "Oktober 2025 – Juni 2026"}

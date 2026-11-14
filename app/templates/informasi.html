@@ -42,78 +42,17 @@
       <p class="muted small-2">Ringkasan kondisi nasional dan daftar wilayah dengan nilai terendah dan tertinggi tersedia di Beranda.
         Data dapat diunduh dalam format CSV, dan halaman hasil dapat dicetak atau disimpan sebagai PDF.</p>
     </section>
-      <section class="card info-card" id="faq">
-      <h2>Pertanyaan umum</h2>
-      <details>
-        <summary>Apa itu <i>soil moisture</i> dan satuannya?</summary>
-        <p><i>Soil moisture</i> adalah banyaknya air yang terkandung di dalam tanah. Satuannya m³/m³, yaitu volume air
-          per volume tanah. Nilai 0,30 berarti sekitar 30% volume tanah berisi air.</p>
-      </details>
-      <details>
-        <summary>Apa beda Mode Otomatis dan Mode Simulasi?</summary>
-        <p>Mode Otomatis memakai nilai variabel lingkungan yang tercatat untuk wilayah dan bulan yang dipilih. Mode
-          Simulasi memakai nilai yang Anda masukkan sendiri, sehingga hasilnya merupakan skenario hipotetis.</p>
-      </details>
-      <details>
-        <summary>Bagaimana membaca grafik SHAP?</summary>
-        <p>Grafik dimulai dari rata-rata keluaran model. Batang hijau menunjukkan variabel yang menaikkan estimasi,
-          batang merah menunjukkan variabel yang menurunkannya. Jumlah semua kontribusi ditambah rata-rata model sama
-          dengan nilai estimasi.</p>
-      </details>
-      <details>
-        <summary>Apa arti warna, arsiran, dan warna biru pada peta?</summary>
-        <p>Warna wilayah menunjukkan nilai <i>soil moisture</i> SMAP L4 pada bulan terpilih: cokelat untuk nilai rendah
-          (kering) dan hijau kebiruan untuk nilai tinggi (basah), dengan 8 kelas selebar 0,05 m³/m³ dari 0,10 sampai 0,50.
-          {% if lapisan_gambut %}Arsiran menunjukkan sebaran lahan gambut sesuai peta gambut Kementan.{% else %}Arsiran menandai kabupaten/kota dengan lahan gambut minimal 20% dari luas wilayahnya.{% endif %}
-          {% if lapisan_air %}Warna biru menunjukkan danau dan waduk besar (luas minimal 25 km²) sesuai bentuk aslinya; arahkan kursor untuk melihat namanya. Sungai, tambak, dan badan air kecil tidak digambar, tetapi tetap dihitung dalam proporsi badan air wilayah.{% else %}Ikon air menandai wilayah dengan badan air minimal 20%.{% endif %}</p>
-      </details>
-      <details>
-        <summary>Apa arti "di bawah" atau "di atas rata-rata" pada ringkasan kondisi?</summary>
-        <p>Nilai suatu bulan dibandingkan dengan rata-rata bulan yang sama pada tahun-tahun lain yang tersedia.
-          Contoh: "0,02 m³/m³ di bawah rata-rata Juni 2023–2025" berarti nilai Juni tahun ini lebih rendah 0,02 m³/m³
-          dibanding rata-rata bulan Juni tahun 2023, 2024, dan 2025. Selisih kurang dari 0,01 m³/m³ disebut setara.
-          Ringkasan dihitung dari nilai acuan SMAP L4, bukan dari hasil prediksi model.</p>
-      </details>
-      <details>
-        <summary>Mengapa ada peringatan pada wilayah gambut?</summary>
-        <p>Kelembapan tanah gambut lebih banyak dipengaruhi muka air tanah dan drainase, yang tidak tercakup dalam
-          variabel model, sehingga estimasi di wilayah gambut kurang akurat dibanding wilayah lain. Untuk wilayah dengan
-          gambut minimal 20%, halaman hasil menampilkan rentang perkiraan berdasarkan galat model pada data uji.</p>
-      </details>
-      <details>
-        <summary>Bagaimana mengunduh data?</summary>
-        <p>Di Beranda, bagian "Unduh data (CSV)" menyediakan rata-rata nasional per bulan, data bulanan seluruh
-          kabupaten/kota (semua tahun atau tahun tertentu), dan rata-rata tahunan seluruh kabupaten/kota. Di halaman hasil,
-          tombol "Unduh CSV" menyediakan data bulanan wilayah tersebut: nilai SMAP, estimasi model, dan 12 variabel
-          lingkungan. Berkas menggunakan pemisah titik koma dan desimal koma sehingga dapat langsung dibuka di Excel.</p>
-      </details>
-    </section>
-      <section class="card info-card" id="akurasi">
-        <h2>Akurasi model</h2>
-        {% set m = konf.get('metrik_uji_indonesia') %}
-        {% if m %}
-        <div class="note ok akurasi-ringkas">Secara rata-rata, estimasi berselisih sekitar <b>±{{ m.MAE | angka(3) }} m³/m³</b>
-          dari nilai acuan SMAP L4.{% for n, d in (konf.get('metrik_uji_wilayah_khusus') or {}).items() if n.startswith('Wilayah gambut') %}
-          Di wilayah gambut, selisihnya lebih besar, sekitar <b>±{{ d.MAE | angka(3) }} m³/m³</b>, sehingga hasil di wilayah tersebut perlu ditafsirkan dengan hati-hati.{% endfor %}</div>
-        <p>Model yang digunakan: <b>{{ {'xgb': 'XGBoost', 'rf': 'Random Forest', 'RF': 'Random Forest', 'Gabungan': 'gabungan Random Forest dan XGBoost', 'gabungan': 'gabungan Random Forest dan XGBoost'}.get(konf.get('pendekatan'), konf.get('pendekatan', '-')) }}</b>{% set reg = (konf.get('per_kelompok') or {}).items() | selectattr(1, 'equalto', 'regional') | map(attribute=0) | list %}{% if reg %}, dengan model regional untuk {{ reg | join(' dan ') }} dan model nasional untuk wilayah lainnya{% endif %}.
-          {% if konf.get('dilatih_ulang') %}Model dilatih ulang dengan data sampai {{ konf.get('data_latih_sampai') | bulan_teks }}. Akurasi di bawah diukur pada data {{ konf.get('periode_uji') }} sebelum bulan-bulan tersebut ikut dipakai dalam pelatihan.{% else %}Pengujian dilakukan pada data Oktober 2025 – Juni 2026 yang tidak digunakan dalam pelatihan model.{% endif %}</p>
+      <section class="card info-card" id="teknologi">
+        <h2>Teknologi yang digunakan</h2>
         <table class="src">
-          <tr><th>Cakupan</th><th>R²</th><th>MAE (m³/m³)</th></tr>
-          <tr><td>Seluruh Indonesia</td><td>{{ m.R2 | angka(2) }}</td><td>{{ m.MAE | angka(3) }}</td></tr>
-          {% for n, d in (konf.get('metrik_uji_wilayah_khusus') or {}).items() %}
-          <tr><td>{{ n | replace('(>=20%)', '(gambut ≥ 20%)') | replace('Wilayah gambut (gambut ≥ 20%)', 'Wilayah gambut (≥ 20%)') }}</td><td>{{ d.R2 | angka(2) }}</td><td>{{ d.MAE | angka(3) }}</td></tr>
-          {% endfor %}
+          <tr><th>Bagian</th><th>Teknologi</th></tr>
+          <tr><td>Ekstraksi data</td><td>Google Earth Engine (dijalankan melalui Google Colab)</td></tr>
+          <tr><td>Pengolahan data</td><td>Python, pandas, NumPy</td></tr>
+          <tr><td>Model</td><td>scikit-learn (<i>Random Forest</i>), XGBoost</td></tr>
+          <tr><td>Interpretasi model</td><td>SHAP</td></tr>
+          <tr><td>Basis data</td><td>SQLite</td></tr>
+          <tr><td>Aplikasi web</td><td>Flask dan Jinja2 (sisi server); HTML, CSS, JavaScript, peta SVG (sisi pengguna)</td></tr>
         </table>
-        <p class="muted small-2"><b>R²</b> (0–1) menunjukkan seberapa baik estimasi mengikuti naik-turunnya nilai sebenarnya;
-          makin mendekati 1 makin baik. <b>MAE</b> adalah rata-rata selisih antara estimasi dan nilai acuan SMAP L4;
-          makin kecil makin baik.</p>
-        {% else %}
-        <p class="muted">Informasi akurasi belum tersedia (jalankan script 05).</p>
-        {% endif %}
-      </section>
-      <section class="card info-card dev" id="pengembang">
-        <div class="avatar">MA</div>
-        <div><div class="muted small-2">Pengembang</div><b>Muhammad Afzaal</b></div>
       </section>
     </div>
     <div class="info-stack">
@@ -136,42 +75,170 @@
         <tr><td>Kandungan liat</td><td>OpenLandMap</td></tr>
         <tr><td>Proporsi badan air dan lahan pertanian</td><td>ESA WorldCover 2021</td></tr>
         <tr><td>Proporsi lahan gambut</td><td>Peta Lahan Gambut Indonesia 1:50.000 (Kementan, 2019), melalui Trase</td></tr>
+        <tr><td>pH tanah lapisan 0–30 cm (informasi tambahan, tidak dipakai model)</td><td>OpenLandMap Soil pH in H<sub>2</sub>O</td></tr>
         <tr><td>Batas kabupaten/kota ({{ jumlah_wilayah }} wilayah, 38 provinsi)</td><td>FAO GAUL 2025</td></tr>
       </table>
       <p class="muted small-2">Badan air dihitung dari kelas "Permanent water bodies" ESA WorldCover; laut dikeluarkan
         dengan elevasi SRTM dan jarak dari garis pantai. Lahan pertanian dihitung dari kelas "Cropland" (tanaman semusim).
         Nilai rata-rata nasional adalah rata-rata seluruh kabupaten/kota, dengan bobot yang sama untuk setiap wilayah.</p>
     </section>
-      <section class="card info-card" id="teknologi">
-        <h2>Teknologi yang digunakan</h2>
-        <table class="src">
-          <tr><th>Bagian</th><th>Teknologi</th></tr>
-          <tr><td>Ekstraksi data</td><td>Google Earth Engine (dijalankan melalui Google Colab)</td></tr>
-          <tr><td>Pengolahan data</td><td>Python, pandas, NumPy</td></tr>
-          <tr><td>Model</td><td>scikit-learn (<i>Random Forest</i>), XGBoost</td></tr>
-          <tr><td>Interpretasi model</td><td>SHAP</td></tr>
-          <tr><td>Basis data</td><td>SQLite</td></tr>
-          <tr><td>Aplikasi web</td><td>Flask dan Jinja2 (sisi server); HTML, CSS, JavaScript, peta SVG (sisi pengguna)</td></tr>
-        </table>
-      </section>
-      <section class="card info-card" id="batasan">
-        <h2>Batasan</h2>
-        <ul class="limits">
-          <li>Estimasi bersifat bulanan per kabupaten/kota, tidak menggambarkan variasi di dalam wilayah maupun variasi harian.</li>
-          <li>Estimasi menggambarkan kondisi pada periode yang datanya tersedia, bukan prediksi untuk bulan mendatang.</li>
-          <li>Estimasi di wilayah gambut kurang akurat dibanding wilayah lain, karena muka air tanah dan drainase tidak
-            tercakup dalam variabel model.</li>
-          <li>Satu piksel SMAP L4 berukuran sekitar 9 km, sehingga nilai kota yang kecil dapat ikut dipengaruhi sungai,
-            rawa, atau laut di sekitarnya.</li>
-          <li>Tiga wilayah yang lebih kecil dari satu piksel data dan berada di pesisir (Kota Sibolga, Kota Pekalongan,
-            dan Kepulauan Seribu) memakai nilai rata-rata area di sekitarnya (radius 10–30 km).</li>
-          <li>Data SMAP L4 dapat diproses ulang oleh NASA. Data dalam aplikasi ini diekstrak dari Google Earth Engine
-            pada 1 November 2026; nilai bulan yang sama dapat sedikit berbeda jika diekstrak pada waktu lain.</li>
-          <li>Kelas lahan pertanian ESA WorldCover hanya mencakup tanaman semusim, sehingga perkebunan tidak termasuk.</li>
-        </ul>
-      </section>
       
     </div>
+    <section class="card info-card info-lebar" id="akurasi">
+      <h2>Akurasi model</h2>
+      {% set m = konf.get('metrik_uji_indonesia') %}
+      {% if m %}
+      <div class="note ok akurasi-ringkas">Secara rata-rata, estimasi aplikasi berselisih sekitar <b>±{{ m.MAE | angka(3) }} m³/m³</b>
+        dari nilai acuan SMAP L4 (R² {{ m.R2 | angka(2) }}, seluruh Indonesia).</div>
+      <p>Penelitian ini melatih <b>16 model</b>: Random Forest dan XGBoost, masing-masing satu model <b>nasional</b>
+        (dilatih dengan data seluruh Indonesia) dan tujuh model <b>regional</b> (satu untuk setiap kelompok wilayah).
+        {% if konf.get('dilatih_ulang') %}Model yang dipakai sudah dilatih ulang dengan data sampai {{ konf.get('data_latih_sampai') | bulan_teks }};
+        tabel berikut adalah hasil pengujian awal pada data {{ mm.periode_uji if mm else 'Oktober 2025 – Juni 2026' }}.
+        {% else %}Semua model diuji pada data Oktober 2025 – Juni 2026 yang tidak digunakan dalam pelatihan.{% endif %}</p>
+      <div class="akurasi-kolom">
+      <div>
+      {% if mm %}
+      <div class="mm-gulir"><table class="mm">
+        <thead>
+          <tr><th>Model</th><th colspan="2" class="grp">Random Forest</th><th colspan="2" class="grp">XGBoost</th></tr>
+          <tr><th></th><th class="grp">R²</th><th>MAE</th><th class="grp">R²</th><th>MAE</th></tr>
+        </thead>
+        <tbody>
+        {% for r in mm.baris %}
+          <tr><td>{{ r.nama }}<small>{{ r.ket }}</small></td>
+          {% for j in ['rf', 'xgb'] %}{% set c = r[j] %}
+            {% if c %}<td class="grp{{ ' on' if c.dipakai }}">{% if c.dipakai %}<span class="ck" aria-label="dipakai aplikasi">✓</span>{% endif %}{{ c.R2 | angka(2) }}</td><td class="{{ 'on' if c.dipakai }}">{{ c.MAE | angka(3) }}</td>
+            {% else %}<td class="grp">–</td><td>–</td>{% endif %}
+          {% endfor %}</tr>
+        {% endfor %}
+        </tbody>
+      </table></div>
+      {% endif %}
+      <p class="muted small-2 mm-ket"><b>R²</b> (0–1) menunjukkan seberapa baik estimasi mengikuti naik-turunnya nilai sebenarnya;
+        makin mendekati 1 makin baik. <b>MAE</b> (m³/m³) adalah rata-rata selisih antara estimasi dan nilai acuan SMAP L4;
+        makin kecil makin baik. Model nasional diuji pada seluruh Indonesia, model regional pada kelompok wilayahnya.</p>
+      </div>
+      {% if mm %}
+      {% set nas = mm.baris[0] %}{% set pdk = konf.get('pendekatan', '') | lower %}
+      {% set alg = 'XGBoost' if pdk in ('xgboost', 'xgb') else ('Random Forest' if pdk in ('rf', 'random forest') else 'Model gabungan') %}
+      <div class="mm-pakai">
+        <p><b>✓ Model yang dipakai aplikasi</b> dipilih dalam dua langkah:</p>
+        <ol>
+          <li><b>Memilih algoritma.</b>
+            {% if alg == 'XGBoost' and nas.rf and nas.xgb %}Pada baris <i>Nasional</i> di tabel, XGBoost lebih akurat dibandingkan dengan
+            Random Forest: R² XGBoost {{ nas.xgb.R2 | angka(2) }} dan Random Forest {{ nas.rf.R2 | angka(2) }};
+            MAE XGBoost {{ nas.xgb.MAE | angka(3) }} m³/m³ dan Random Forest {{ nas.rf.MAE | angka(3) }} m³/m³.
+            Karena itu, XGBoost merupakan model yang digunakan.
+            {% elif alg == 'Random Forest' and nas.rf and nas.xgb %}Pada baris <i>Nasional</i> di tabel, Random Forest lebih akurat daripada XGBoost:
+            R² {{ nas.rf.R2 | angka(2) }} dibanding {{ nas.xgb.R2 | angka(2) }}, dan MAE {{ nas.rf.MAE | angka(3) }} dibanding {{ nas.xgb.MAE | angka(3) }} m³/m³.
+            Karena itu Random Forest yang dipakai.
+            {% else %}Dipilih pendekatan dengan kesalahan terkecil pada data uji seluruh Indonesia.{% endif %}</li>
+          <li><b>Memilih model nasional atau regional.</b> Untuk setiap kelompok wilayah, model nasional dibandingkan dengan
+            model regionalnya. Batas maksimal kesalahan model nasional adalah <b>10% lebih buruk</b> daripada model regional.
+            Jika masih di bawah batas itu, model nasional yang dipakai (hasilnya hampir sama, dan satu model lebih sederhana).
+            Jika melewati batas, model regional yang dipakai.</li>
+        </ol>
+        {% if mm.aturan %}
+        {% set j = mm.aturan | selectattr('dipakai', 'equalto', 'regional') | first %}
+        {% if j %}<p class="mm-contoh">Contoh: di {{ j.nama }}, kesalahan (RMSE) model nasional {{ j.rmse_nasional | angka(4) }} dan model regional {{ j.rmse_regional | angka(4) }} m³/m³.
+          Model nasional ({{ j.rmse_nasional | angka(4) }} − {{ j.rmse_regional | angka(4) }}) ÷ {{ j.rmse_regional | angka(4) }} = {{ j.selisih_persen | angka(1) }}% lebih buruk,
+          lebih dari 10%, sehingga dipakai model regional {{ j.nama }}.</p>{% endif %}
+        <div class="mm-gulir"><table class="mm mm-10">
+          <thead><tr><th>Kelompok</th><th>RMSE nasional</th><th>RMSE regional</th><th>Nasional lebih buruk</th><th>Dipakai</th></tr></thead>
+          <tbody>
+          {% for a in mm.aturan %}
+            <tr><td>{{ a.nama }}</td><td>{{ a.rmse_nasional | angka(4) }}</td><td>{{ a.rmse_regional | angka(4) }}</td>
+              <td class="{{ 'lebih' if a.selisih_persen > 10 }}">{% if a.selisih_persen < 0 %}−{{ (a.selisih_persen | abs) | angka(1) }}%<small>justru lebih baik</small>{% else %}{{ a.selisih_persen | angka(1) }}%{% endif %}</td>
+              <td class="on">{{ 'Nasional' if a.dipakai == 'nasional' else 'Regional' }}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table></div>
+        <p class="muted small-2">Kolom <i>Dipakai</i> menunjukkan model {{ alg }} yang dipakai untuk kelompok tersebut. Kesalahan diukur dengan <b>RMSE</b> (m³/m³), yaitu ukuran selisih seperti MAE
+          tetapi memberi bobot lebih besar pada selisih yang besar; makin kecil makin baik.</p>
+        {% endif %}
+      </div>
+      {% endif %}
+      </div>
+      {% else %}
+      <p class="muted">Informasi akurasi belum tersedia (jalankan script 05).</p>
+      {% endif %}
+    </section>
+    <section class="card info-card info-lebar batasan-lebar" id="batasan">
+      <h2>Batasan</h2>
+      <ul class="limits">
+        <li>Estimasi bersifat bulanan per kabupaten/kota, tidak menggambarkan variasi di dalam wilayah maupun variasi harian.</li>
+        <li>Estimasi menggambarkan kondisi pada periode yang datanya tersedia, bukan prediksi untuk bulan mendatang.</li>
+        <li>Estimasi di wilayah gambut kurang akurat dibanding wilayah lain, karena muka air tanah dan drainase tidak
+          tercakup dalam variabel model.</li>
+        <li>Satu piksel SMAP L4 berukuran sekitar 9 km, sehingga nilai kota yang kecil dapat ikut dipengaruhi sungai,
+          rawa, atau laut di sekitarnya.</li>
+        <li>Tiga wilayah yang lebih kecil dari satu piksel data dan berada di pesisir (Kota Sibolga, Kota Pekalongan,
+          dan Kepulauan Seribu) memakai nilai rata-rata area di sekitarnya (radius 10–30 km).</li>
+        <li>Data SMAP L4 dapat diproses ulang oleh NASA. Data dalam aplikasi ini diekstrak dari Google Earth Engine
+          pada 1 November 2026; nilai bulan yang sama dapat sedikit berbeda jika diekstrak pada waktu lain.</li>
+        <li>Kelas lahan pertanian ESA WorldCover hanya mencakup tanaman semusim, sehingga perkebunan tidak termasuk.</li>
+      </ul>
+    </section>
+    <section class="card info-card info-lebar" id="faq">
+    <h2>Pertanyaan umum</h2>
+    <details>
+      <summary>Apa itu <i>soil moisture</i> dan satuannya?</summary>
+      <p><i>Soil moisture</i> adalah banyaknya air yang terkandung di dalam tanah. Satuannya m³/m³, yaitu volume air
+        per volume tanah. Nilai 0,30 berarti sekitar 30% volume tanah berisi air.</p>
+    </details>
+    <details>
+      <summary>Mengapa nilai pH tanah sama untuk setiap bulan?</summary>
+      <p>pH tanah berubah sangat lambat. Perubahan antarmusim umumnya kecil, sedangkan perubahan yang berarti terjadi dalam
+        hitungan tahun atau karena tindakan seperti pengapuran dan pemupukan. Karena itu aplikasi menampilkan satu nilai pH
+        per kabupaten/kota dari peta tanah OpenLandMap, yang dipadukan dengan kondisi kelembapan tanah bulan terpilih.
+        Kesesuaian tanaman mengikuti Petunjuk Teknis Evaluasi Lahan untuk Komoditas Pertanian (Ritung dkk., 2011). Nilai ini
+        merupakan perkiraan rata-rata wilayah, sehingga kebutuhan bahan penyesuaian pH di lahan tertentu tetap perlu
+        ditentukan dengan uji tanah.</p>
+    </details>
+    <details>
+      <summary>Apa perbedaan antara Mode Otomatis dan Mode Simulasi?</summary>
+      <p>Mode Otomatis memakai nilai variabel lingkungan yang tercatat untuk wilayah dan bulan yang dipilih. Mode
+        Simulasi memakai nilai yang Anda masukkan sendiri, sehingga hasilnya merupakan skenario hipotetis.</p>
+    </details>
+    <details>
+      <summary>Bagaimana cara membaca grafik SHAP?</summary>
+      <p>Grafik dimulai dari rata-rata keluaran model. Batang hijau menunjukkan variabel yang menaikkan estimasi,
+        batang merah menunjukkan variabel yang menurunkannya. Jumlah semua kontribusi ditambah rata-rata model sama
+        dengan nilai estimasi.</p>
+    </details>
+    <details>
+      <summary>Apa arti warna wilayah, arsiran gambut, dan area biru pada peta?</summary>
+      <p>Warna wilayah menunjukkan nilai <i>soil moisture</i> SMAP L4 pada bulan terpilih: cokelat untuk nilai rendah
+        (kering) dan hijau kebiruan untuk nilai tinggi (basah), dengan 8 kelas selebar 0,05 m³/m³ dari 0,10 sampai 0,50.
+        {% if lapisan_gambut %}Arsiran menunjukkan sebaran lahan gambut sesuai peta gambut Kementan.{% else %}Arsiran menandai kabupaten/kota dengan lahan gambut minimal 20% dari luas wilayahnya.{% endif %}
+        {% if lapisan_air %}Warna biru menunjukkan danau dan waduk besar (luas minimal 25 km²) sesuai bentuk aslinya; arahkan kursor untuk melihat namanya. Sungai, tambak, dan badan air kecil tidak digambar, tetapi tetap dihitung dalam proporsi badan air wilayah.{% else %}Ikon air menandai wilayah dengan badan air minimal 20%.{% endif %}</p>
+    </details>
+    <details>
+      <summary>Apa arti "di bawah rata-rata" atau "di atas rata-rata" pada ringkasan kondisi?</summary>
+      <p>Nilai suatu bulan dibandingkan dengan rata-rata bulan yang sama pada tahun-tahun lain yang tersedia.
+        Contoh: "0,02 m³/m³ di bawah rata-rata Juni 2023–2025" berarti nilai Juni tahun ini lebih rendah 0,02 m³/m³
+        dibanding rata-rata bulan Juni tahun 2023, 2024, dan 2025. Selisih kurang dari 0,01 m³/m³ disebut setara.
+        Ringkasan dihitung dari nilai acuan SMAP L4, bukan dari hasil prediksi model.</p>
+    </details>
+    <details>
+      <summary>Mengapa terdapat peringatan pada wilayah gambut?</summary>
+      <p>Kelembapan tanah gambut lebih banyak dipengaruhi muka air tanah dan drainase, yang tidak tercakup dalam
+        variabel model, sehingga estimasi di wilayah gambut kurang akurat dibanding wilayah lain. Untuk wilayah dengan
+        gambut minimal 20%, halaman hasil menampilkan peringatan ini; seberapa jauh estimasi meleset dapat dilihat
+        langsung dari perbandingan nilai aktual dan estimasi pada halaman tersebut.</p>
+    </details>
+    <details>
+      <summary>Bagaimana cara mengunduh data?</summary>
+      <p>Di Beranda, bagian "Unduh data (CSV)" menyediakan rata-rata nasional per bulan, data bulanan seluruh
+        kabupaten/kota (semua tahun atau tahun tertentu), dan rata-rata tahunan seluruh kabupaten/kota. Di halaman hasil,
+        tombol "Unduh CSV" menyediakan data bulanan wilayah tersebut: nilai SMAP, estimasi model, dan 12 variabel
+        lingkungan. Berkas menggunakan pemisah titik koma dan desimal koma sehingga dapat langsung dibuka di Excel.</p>
+    </details>
+    </section>
+    <section class="card info-card info-lebar dev" id="pengembang">
+      <div class="avatar">MA</div>
+      <div><div class="muted small-2">Pengembang</div><b>Muhammad Afzaal</b></div>
+    </section>
   </div>
 </div>
 <script>

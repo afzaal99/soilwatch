@@ -1,0 +1,6 @@
+flask
+werkzeug
+numpy
+pandas
+joblib
+xgboost-cpu==3.4.1

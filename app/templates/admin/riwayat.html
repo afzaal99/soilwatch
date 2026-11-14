@@ -1,0 +1,42 @@
+{% extends "admin/_dasar.html" %}
+{% block judul %}Riwayat Aktivitas{% endblock %}
+{% block isi %}
+<div class="page-head">
+  <div>
+    <a class="link-more small" href="{{ url_for('admin.dashboard') }}">← Kembali ke Dashboard</a>
+    <h1 class="p-title">Riwayat Aktivitas</h1>
+    <p class="muted">Semua perubahan data yang dilakukan melalui dashboard admin, dari yang terbaru.</p>
+  </div>
+</div>
+
+<section class="card adm-card">
+  <div class="card-h wrap">
+    <h2>{{ total }} aktivitas</h2>
+    {% if n_hal > 1 %}<span class="muted small">Menampilkan {{ mulai + 1 }}–{{ mulai + daftar | length }} dari {{ total }}</span>{% endif %}
+  </div>
+  {% if daftar %}
+  <div class="adm-tabel-wrap"><table class="src adm-tabel adm-riwayat-tabel">
+    <colgroup><col class="k-waktu"><col class="k-jenis"><col></colgroup>
+    <tr><th>Waktu</th><th>Aktivitas</th><th>Keterangan</th></tr>
+    {% for r in daftar %}
+    <tr>
+      <td class="nowrap">{{ r.waktu_teks }}</td>
+      <td class="nowrap"><span class="adm-titik {{ 'pulih' if r.jenis == 'Pemulihan' }}" aria-hidden="true"></span>
+        <b>{{ 'Data pH' if r.jenis == 'ph' else r.jenis }}</b></td>
+      <td>{{ r.keterangan }}{% if r.berkas %}<br><span class="muted small">Berkas: {{ r.berkas }}</span>{% endif %}
+        {% if r.cadangan %}<br><span class="muted small">Cadangan sebelum perubahan: {{ r.cadangan }}</span>{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </table></div>
+  {% if n_hal > 1 %}
+  <nav class="adm-halaman" aria-label="Halaman riwayat">
+    {% if hal > 1 %}<a class="btn s sm" href="{{ url_for('admin.riwayat', hal=hal - 1) }}">← Sebelumnya</a>{% else %}<span></span>{% endif %}
+    <span class="muted small">Halaman {{ hal }} dari {{ n_hal }}</span>
+    {% if hal < n_hal %}<a class="btn s sm" href="{{ url_for('admin.riwayat', hal=hal + 1) }}">Berikutnya →</a>{% else %}<span></span>{% endif %}
+  </nav>
+  {% endif %}
+  {% else %}
+  <p class="muted adm-kosong-t">Belum ada aktivitas.</p>
+  {% endif %}
+</section>
+{% endblock %}

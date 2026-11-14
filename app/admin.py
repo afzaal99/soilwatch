@@ -6,6 +6,7 @@ Akun admin disimpan di berkas .env (di folder soilwatch, tidak ikut ke GitHub), 
 """
 import hmac
 import os
+import re
 import secrets
 import time
 from functools import wraps
@@ -18,12 +19,15 @@ from werkzeug.security import check_password_hash
 import estimasi as est
 import latih_ulang as lu
 import pembaruan as pb
+import ph_tanah
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 ENV = est.ROOT / ".env"
 _GAGAL = {}                 # ip -> [jumlah gagal, waktu terakhir]; batasi tebak-tebakan kata sandi
 MAKS_GAGAL, JEDA = 5, 300   # 5 kali salah -> tunggu 5 menit
 MAKS_UKURAN = 20 * 1024 * 1024
+BATAS_DIAM = 60 * 60        # keluar otomatis setelah 1 jam tidak ada aktivitas
+PER_HALAMAN = 30            # baris per halaman riwayat aktivitas
 
 
 def baca_env():
@@ -51,6 +55,11 @@ def wajib_masuk(fn):
     def bungkus(*a, **kw):
         if not session.get("admin"):
             return redirect(url_for("admin.masuk", lanjut=request.path))
+        if time.time() - session.get("aktif", 0) > BATAS_DIAM:
+            session.clear()
+            flash("Sesi berakhir karena tidak ada aktivitas selama 1 jam. Silakan masuk kembali.", "galat")
+            return redirect(url_for("admin.masuk", lanjut=request.path if request.method == "GET" else ""))
+        session["aktif"] = time.time()
         return fn(*a, **kw)
     return bungkus
 
@@ -96,6 +105,7 @@ def masuk():
             _GAGAL.pop(ip, None)
             session.clear()
             session["admin"] = nama
+            session["aktif"] = time.time()
             session.permanent = True
             lanjut = request.args.get("lanjut", "")
             return redirect(lanjut if lanjut.startswith("/admin") else url_for("admin.dashboard"))
@@ -152,11 +162,23 @@ def dashboard():
     evals = pb.evaluasi_tersimpan()
     return render_template(
         "admin/dashboard.html", menu="admin", bagian="dashboard", jadwal=pb.info_jadwal(), riwayat=pb.riwayat(8),
+        n_riwayat=pb.jumlah_riwayat(),
         cadangan=pb.daftar_cadangan()[:5], evals=evals[::-1][:6], grafik=grafik_mae(evals, mae),
         mae_uji=mae, r2_uji=r2, n_bulan=len(est.DATA["periode"]), n_wilayah=len(est.WILAYAH),
         awal=est.DATA["periode_label"][0], akhir=est.DATA["periode_label"][-1], konf=est.KONF or {},
         ambang=pb.AMBANG_MAE, terakhir_perhatian=bool(evals and mae and evals[-1]["mae"] > mae * pb.AMBANG_MAE),
         latih=lu.kesiapan(), status_latih=lu.baca_status(), kand=lu.kandidat())
+
+
+@bp.route("/riwayat")
+@wajib_masuk
+def riwayat():
+    total = pb.jumlah_riwayat()
+    n_hal = max(1, -(-total // PER_HALAMAN))
+    hal = min(max(request.args.get("hal", 1, type=int), 1), n_hal)
+    return render_template("admin/riwayat.html", menu="admin", bagian="dashboard", total=total, hal=hal,
+                           n_hal=n_hal, mulai=(hal - 1) * PER_HALAMAN,
+                           daftar=pb.riwayat(PER_HALAMAN, (hal - 1) * PER_HALAMAN))
 
 
 # ----------------------------------------------------------------------------- unggah
@@ -231,6 +253,124 @@ def batal(token):
 
 
 # ----------------------------------------------------------------------------- cadangan
+# ----------------------------------------------------------------------------- pH tanah lapangan (bulanan)
+@bp.route("/ph", methods=["GET", "POST"])
+@wajib_masuk
+def ph():
+    hasil = None
+    if request.method == "POST":
+        daftar = [f for f in request.files.getlist("berkas") if f and f.filename]
+        if not daftar:
+            flash("Pilih berkas CSV terlebih dahulu.", "galat")
+            return redirect(url_for("admin.ph"))
+        if len(daftar) > 24:
+            flash("Paling banyak 24 berkas sekaligus.", "galat")
+            return redirect(url_for("admin.ph"))
+        semua, galat, nama = {}, [], []
+        for f in daftar:
+            nm = Path(f.filename).name
+            awal = f"{nm}: " if len(daftar) > 1 else ""
+            if not nm.lower().endswith(".csv"):
+                galat.append(f"{awal}format berkas harus .csv. Gunakan template yang disediakan, lalu simpan sebagai CSV.")
+                continue
+            isi = f.read(MAKS_UKURAN + 1)
+            if len(isi) > MAKS_UKURAN:
+                galat.append(f"{awal}ukuran berkas melebihi 20 MB.")
+                continue
+            baris, g, _ = ph_tanah.periksa_lapangan(isi, est.WILAYAH)
+            galat += [awal + x for x in g]
+            for r in baris:
+                k = (r[0], r[1], r[2])
+                if k in semua and semua[k][3] != r[3]:
+                    galat.append(f"{awal}{r[1]} periode {r[0]} juga ada di berkas lain dengan nilai pH berbeda "
+                                 f"({semua[k][3]} dan {r[3]}). Pilih salah satu.")
+                semua[k] = r
+            nama.append(nm)
+        if galat:
+            hasil = {"ok": False, "galat": galat[:15], "lebih": max(0, len(galat) - 15)}
+        else:
+            baris = list(semua.values())
+            n_wil = len({(r[1], r[2]) for r in baris})
+            per = sorted({r[0] for r in baris})
+            hit = ph_tanah.simpan_lapangan(baris)
+            ket_per = ", ".join(ph_tanah.label_periode(p) for p in per)
+            con = pb._tulis()
+            try:
+                pb._catat(con, "Data pH", f"Data pH lapangan {ket_per}: {hit['baru']} baris baru, {hit['diganti']} "
+                          f"diperbarui ({n_wil} wilayah)", berkas=", ".join(nama))
+                con.commit()
+            finally:
+                con.close()
+            flash(f"Data pH lapangan tersimpan dari {len(nama)} berkas ({ket_per}): {hit['baru']} baris baru dan "
+                  f"{hit['diganti']} baris diperbarui untuk {n_wil} kabupaten/kota.", "ok")
+            return redirect(url_for("admin.ph"))
+    return render_template("admin/ph.html", menu="admin", bagian="ph", hasil=hasil,
+                           ringkas=ph_tanah.ringkas_lapangan(), batas=ph_tanah.BATAS_PH,
+                           per_periode=ph_tanah.per_periode(), bulan_templat=est.DATA["periode"][-1],
+                           cadangan_ph=ph_tanah.info_cadangan())
+
+
+@bp.route("/ph/hapus", methods=["POST"])
+@wajib_masuk
+def ph_hapus():
+    periode = request.form.get("periode", "")
+    semua = periode == "semua"
+    if not semua and not re.fullmatch(r"\d{4}-(0[1-9]|1[0-2])", periode):
+        abort(400)
+    n = ph_tanah.hapus_lapangan(None if semua else periode)
+    if n:
+        ket = "seluruh data pH lapangan" if semua else f"data pH lapangan {ph_tanah.label_periode(periode)}"
+        con = pb._tulis()
+        try:
+            pb._catat(con, "Data pH", f"Menghapus {ket} ({n} baris). Data dapat dikembalikan dari halaman Data pH.")
+            con.commit()
+        finally:
+            con.close()
+        flash(f"Berhasil menghapus {ket} ({n} baris).", "ok")
+    else:
+        flash("Tidak ada data yang dihapus.", "galat")
+    return redirect(url_for("admin.ph") + "#tersimpan")
+
+
+@bp.route("/ph/pulihkan", methods=["POST"])
+@wajib_masuk
+def ph_pulihkan():
+    info = ph_tanah.info_cadangan()
+    if info and ph_tanah.pulihkan_cadangan():
+        con = pb._tulis()
+        try:
+            pb._catat(con, "Data pH", f"Mengembalikan data pH lapangan ke salinan {info['waktu']} "
+                      f"({info['baris']} baris, {info['wilayah']} wilayah: {info['periode']})")
+            con.commit()
+        finally:
+            con.close()
+        flash(f"Data pH lapangan dikembalikan ke salinan {info['waktu']} ({info['baris']} baris). "
+              "Data sebelumnya kini menjadi salinan dan dapat dikembalikan lagi bila perlu.", "ok")
+    else:
+        flash("Tidak ada salinan data pH yang dapat dikembalikan.", "galat")
+    return redirect(url_for("admin.ph"))
+
+
+@bp.route("/ph/templat")
+@wajib_masuk
+def ph_templat():
+    periode = request.args.get("periode", "")
+    if not re.fullmatch(r"\d{4}-(0[1-9]|1[0-2])", periode):
+        periode = est.DATA["periode"][-1]
+    teks = ph_tanah.templat_csv(est.WILAYAH, periode)
+    return Response(teks, mimetype="text/csv", headers={
+        "Content-Disposition": f'attachment; filename="template_ph_lapangan_{periode}.csv"'})
+
+
+@bp.route("/ph/data")
+@wajib_masuk
+def ph_data():
+    if not ph_tanah.BERKAS_LAP.exists():
+        abort(404)
+    return Response(ph_tanah.BERKAS_LAP.read_text(encoding="utf-8-sig"), mimetype="text/csv", headers={
+        "Content-Disposition": 'attachment; filename="ph_lapangan.csv"'})
+
+
 @bp.route("/cadangan")
 @wajib_masuk
 def cadangan():

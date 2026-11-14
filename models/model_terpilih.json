@@ -45,5 +45,142 @@
    "n": 4014.0
   }
  },
+ "metrik_semua_model": {
+  "rf": {
+   "nasional": {
+    "R2": 0.688,
+    "MAE": 0.0391,
+    "RMSE": 0.0507
+   },
+   "Sumatera": {
+    "R2": 0.715,
+    "MAE": 0.0388,
+    "RMSE": 0.0497
+   },
+   "Jawa": {
+    "R2": 0.7067,
+    "MAE": 0.0251,
+    "RMSE": 0.0331
+   },
+   "Bali-Nusa Tenggara": {
+    "R2": 0.6169,
+    "MAE": 0.0367,
+    "RMSE": 0.0447
+   },
+   "Kalimantan": {
+    "R2": 0.896,
+    "MAE": 0.0247,
+    "RMSE": 0.0358
+   },
+   "Sulawesi": {
+    "R2": 0.4183,
+    "MAE": 0.0324,
+    "RMSE": 0.0407
+   },
+   "Maluku": {
+    "R2": 0.4319,
+    "MAE": 0.0411,
+    "RMSE": 0.0509
+   },
+   "Papua": {
+    "R2": 0.9181,
+    "MAE": 0.0197,
+    "RMSE": 0.0259
+   }
+  },
+  "xgb": {
+   "nasional": {
+    "R2": 0.7921,
+    "MAE": 0.0314,
+    "RMSE": 0.0414
+   },
+   "Sumatera": {
+    "R2": 0.7188,
+    "MAE": 0.0388,
+    "RMSE": 0.0493
+   },
+   "Jawa": {
+    "R2": 0.8351,
+    "MAE": 0.0193,
+    "RMSE": 0.0249
+   },
+   "Bali-Nusa Tenggara": {
+    "R2": 0.6378,
+    "MAE": 0.0358,
+    "RMSE": 0.0435
+   },
+   "Kalimantan": {
+    "R2": 0.8786,
+    "MAE": 0.0265,
+    "RMSE": 0.0386
+   },
+   "Sulawesi": {
+    "R2": 0.4751,
+    "MAE": 0.0311,
+    "RMSE": 0.0387
+   },
+   "Maluku": {
+    "R2": 0.3927,
+    "MAE": 0.042,
+    "RMSE": 0.0526
+   },
+   "Papua": {
+    "R2": 0.9079,
+    "MAE": 0.0208,
+    "RMSE": 0.0274
+   }
+  }
+ },
+ "aturan_10_persen": [
+  {
+   "kelompok": "Sumatera",
+   "rmse_nasional": 0.05,
+   "rmse_regional": 0.0493,
+   "selisih_persen": 1.4,
+   "dipakai": "nasional"
+  },
+  {
+   "kelompok": "Jawa",
+   "rmse_nasional": 0.0288,
+   "rmse_regional": 0.0249,
+   "selisih_persen": 15.8,
+   "dipakai": "regional"
+  },
+  {
+   "kelompok": "Bali-Nusa Tenggara",
+   "rmse_nasional": 0.0436,
+   "rmse_regional": 0.0435,
+   "selisih_persen": 0.3,
+   "dipakai": "nasional"
+  },
+  {
+   "kelompok": "Kalimantan",
+   "rmse_nasional": 0.0419,
+   "rmse_regional": 0.0386,
+   "selisih_persen": 8.5,
+   "dipakai": "nasional"
+  },
+  {
+   "kelompok": "Sulawesi",
+   "rmse_nasional": 0.0399,
+   "rmse_regional": 0.0387,
+   "selisih_persen": 3.2,
+   "dipakai": "nasional"
+  },
+  {
+   "kelompok": "Maluku",
+   "rmse_nasional": 0.0489,
+   "rmse_regional": 0.0526,
+   "selisih_persen": -7.0,
+   "dipakai": "nasional"
+  },
+  {
+   "kelompok": "Papua",
+   "rmse_nasional": 0.031,
+   "rmse_regional": 0.0274,
+   "selisih_persen": 12.9,
+   "dipakai": "regional"
+  }
+ ],
  "dibuat": "2026-11-01T20:19:57"
 }

@@ -12,6 +12,7 @@ SEED = 42
 
 
 def muat_data():
+    # memisahkan data latih dam uji 
     """Data bersih hasil script 01, dipisah menjadi data latih dan data uji."""
     df = pd.read_csv(DATA_PROCESSED / "dataset_bersih.csv", parse_dates=["periode"])
     latih = df[df["subset"] == "latih"].reset_index(drop=True)
@@ -20,6 +21,7 @@ def muat_data():
 
 
 def metrik(y, p):
+    # menghitung R2 dan RMSE
     y, p = np.asarray(y), np.asarray(p)
     return {"R2": r2_score(y, p), "MAE": mean_absolute_error(y, p),
             "RMSE": float(np.sqrt(mean_squared_error(y, p))), "n": len(y)}
@@ -35,6 +37,7 @@ def nama_file(kelompok):
 
 
 def lipatan_waktu(periode, k=5):
+    # 
     """5-fold time-series CV: bulan diurutkan, lalu dibagi k+1 blok berurutan.
     Lipatan ke-i melatih blok 1..i dan memvalidasi blok i+1 (expanding window)."""
     bulan = np.sort(periode.unique())

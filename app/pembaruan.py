@@ -8,6 +8,7 @@ script 01 -> evaluasi akurasi model terhadap SMAP pada bulan baru -> simpan ke b
 Modul ini tidak bergantung pada Flask agar mudah diuji dan dipakai ulang.
 """
 import importlib
+import os
 import io
 import json
 import math
@@ -25,7 +26,7 @@ import estimasi as est
 
 ROOT = est.ROOT
 DB = est.DB
-INSTANCE = ROOT / "instance"              # tidak ikut ke GitHub (lihat .gitignore)
+INSTANCE = Path(os.environ.get("SOILWATCH_INSTANCE") or ROOT / "instance")   # Vercel: /tmp/soilwatch (hanya /tmp yang bisa ditulisi)
 STAGING = INSTANCE / "unggahan"           # unggahan yang menunggu konfirmasi
 CADANGAN = INSTANCE / "cadangan"          # salinan basis data sebelum setiap perubahan
 MAKS_CADANGAN = 12
@@ -150,12 +151,21 @@ def _tulis():
     return con
 
 
-def riwayat(n=20):
+def riwayat(n=20, mulai=0):
     con = _tulis()
     try:
         return [{**dict(zip(["waktu", "jenis", "keterangan", "berkas", "cadangan"], r)),
                  "waktu_teks": _waktu_teks(r[0])} for r in con.execute(
-            "SELECT waktu, jenis, keterangan, berkas, cadangan FROM riwayat ORDER BY id DESC LIMIT ?", (n,))]
+            "SELECT waktu, jenis, keterangan, berkas, cadangan FROM riwayat ORDER BY id DESC LIMIT ? OFFSET ?",
+            (n, mulai))]
+    finally:
+        con.close()
+
+
+def jumlah_riwayat():
+    con = _tulis()
+    try:
+        return con.execute("SELECT COUNT(*) FROM riwayat").fetchone()[0]
     finally:
         con.close()
 
@@ -383,7 +393,7 @@ def periksa(isi, nama_berkas):
     artefak = gabung["kode"].isin(bulan_baru) & (gabung["solar_radiation"] < 0.5 * med)
     if artefak.any():
         lap.info.append(f"Radiasi matahari di {int(artefak.sum())} baris kurang dari 50% median wilayahnya "
-                        "(artefak pesisir/pulau kecil), jadi dianggap nilai hilang seperti pada data latih.")
+                        "(nilai tidak wajar di pesisir/pulau kecil), jadi dianggap nilai hilang seperti pada data latih.")
         gabung.loc[artefak, "solar_radiation"] = np.nan
     hilang = int(gabung.loc[gabung["kode"].isin(bulan_baru), fitur].isna().sum().sum())
     if hilang:

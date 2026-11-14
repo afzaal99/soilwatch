@@ -7,6 +7,7 @@ Menjalankan secara lokal:
 lalu buka http://127.0.0.1:5000
 """
 import json
+import os
 import secrets
 from datetime import timedelta
 from pathlib import Path
@@ -16,6 +17,7 @@ from markupsafe import Markup
 
 import admin
 import estimasi as est
+import ph_tanah
 import ringkasan as rkn
 
 BASE = Path(__file__).resolve().parent
@@ -23,7 +25,7 @@ app = Flask(__name__)
 app.jinja_env.filters["angka"] = est.fmt
 app.jinja_env.filters["bulan_teks"] = lambda k: est.label_bulan(k) if k else ""
 app.secret_key = admin.baca_env().get("SECRET_KEY") or secrets.token_hex(32)
-app.config.update(MAX_CONTENT_LENGTH=25 * 1024 * 1024, PERMANENT_SESSION_LIFETIME=timedelta(hours=8),
+app.config.update(MAX_CONTENT_LENGTH=25 * 1024 * 1024, PERMANENT_SESSION_LIFETIME=timedelta(hours=1),
                   SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE="Lax")
 app.register_blueprint(admin.bp)
 
@@ -66,6 +68,25 @@ def info_fitur():
 
 def periode_default():
     return est.DATA["periode"][-1]
+
+
+PESAN_GALAT = {
+    400: ("Permintaan tidak dapat diproses", "Data yang dikirim tidak sesuai. Muat ulang halaman, lalu coba lagi."),
+    404: ("Halaman tidak ditemukan", "Alamat yang dibuka tidak tersedia, atau wilayah dan bulan yang dipilih belum ada datanya."),
+    500: ("Terjadi kesalahan", "Terjadi kesalahan pada aplikasi. Silakan coba beberapa saat lagi."),
+}
+
+
+@app.errorhandler(400)
+@app.errorhandler(404)
+@app.errorhandler(500)
+def halaman_galat(e):
+    kode = getattr(e, "code", 500) or 500
+    judul, pesan = PESAN_GALAT.get(kode, PESAN_GALAT[500])
+    desk = getattr(e, "description", "")
+    if kode == 400 and desk and not desk.startswith("The browser"):
+        pesan = desk                                   # pesan khusus, mis. formulir admin kedaluwarsa
+    return render_template("segera.html", judul=judul, pesan=pesan), kode
 
 
 @app.route("/")
@@ -153,6 +174,8 @@ def hasil():
         sub=f'{w["prov"]} · {est.DATA["periode_label"][i]}', w=w, wid=wid, periode=per,
         v=v, sumber=sumber, kategori=est.kategori(v), wf=est.waterfall(x, v, w["kelompok"]),
         glob=est.kepentingan_global(), tren=est.tren(wid, per), smap=est.sm_wilayah(wid)[i],
+        bd=est.banding(wid, per),
+        ph=ph_tanah.info(w, est.DATA["penanda"][wid][0]), ph_lap=ph_tanah.lapangan(w),
         penanda=est.DATA["penanda"][wid], stat=est.STAT["soil_moisture"],
         gambut=est.galat_gambut(v) if est.DATA["penanda"][wid][0] >= 20 else None,
         rk=rkn.wilayah(wid, per))
@@ -198,7 +221,7 @@ def api_peta():
 
 @app.route("/informasi")
 def informasi():
-    return render_template("informasi.html", menu="informasi")
+    return render_template("informasi.html", menu="informasi", mm=est.metrik_semua_model())
 
 
 @app.context_processor
@@ -208,7 +231,9 @@ def umum():
             "sumber_kepentingan": est.DATA.get("sumber_kepentingan", "contoh"),
             "konf": est.KONF or {},
             "rentang_data": f'{est.DATA["periode_label"][0]} – {est.DATA["periode_label"][-1]}',
-            "jumlah_wilayah": len(est.WILAYAH)}
+            "jumlah_wilayah": len(est.WILAYAH),
+            # Vercel memasang VERCEL=1; di sana berkas tidak dapat diubah, jadi perubahan admin tidak tersimpan
+            "mode_demo": bool(os.environ.get("VERCEL") or os.environ.get("SOILWATCH_DEMO"))}
 
 
 if __name__ == "__main__":

@@ -1,0 +1,14 @@
+# Tidak dibutuhkan aplikasi web saat berjalan di Vercel (memperkecil ukuran function)
+models/rf_*.joblib
+data/raw
+data/processed
+data/geo
+reports
+instance
+.venv
+venv
+**/__pycache__
+*.pdf
+*.docx
+*.pptx
+PROMPT_CLAUDE_CODE.md

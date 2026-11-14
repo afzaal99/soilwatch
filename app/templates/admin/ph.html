@@ -1,0 +1,168 @@
+{% extends "admin/_dasar.html" %}
+{% block judul %}Data pH Lapangan{% endblock %}
+{% block isi %}
+<div class="page-head">
+  <div>
+    <h1 class="p-title">Data pH Tanah Lapangan</h1>
+    <p class="muted">Tambahkan hasil uji pH tanah berkala agar pH bulanan dan grafiknya tampil di halaman hasil.</p>
+  </div>
+</div>
+
+<div class="adm-grid unggah rata">
+  <section class="card adm-card adm-isi-tumbuh">
+    <h2 class="adm-h">Unggah data pH</h2>
+
+    {% if ringkas %}
+    <div class="adm-jadwal ph-stat">
+      <div><span class="muted small">Data tersimpan</span><b>{{ ringkas.baris }} baris</b></div>
+      <div><span class="muted small">Kabupaten/kota</span><b>{{ ringkas.wilayah }}</b></div>
+      <div><span class="muted small">Periode</span><b>{{ ringkas.awal }}{% if ringkas.akhir != ringkas.awal %} – {{ ringkas.akhir }}{% endif %}</b></div>
+    </div>
+    <p class="muted small-2 adm-p">Terakhir diperbarui {{ ringkas.diperbarui }} ·
+      <a class="link-more" href="#tersimpan">Lihat atau hapus data</a></p>
+    {% else %}
+    <p class="note">Belum ada data pH lapangan. Halaman hasil saat ini hanya menampilkan pH rata-rata dari peta tanah.</p>
+    {% endif %}
+
+    {% if cadangan_ph %}
+    <div class="adm-pulih-ph">
+      <div><b>Salinan sebelum perubahan terakhir</b>
+        <span class="muted small">{{ cadangan_ph.waktu }} · {{ cadangan_ph.baris }} baris, {{ cadangan_ph.wilayah }} wilayah
+          ({{ cadangan_ph.periode }})</span></div>
+      <form method="post" action="{{ url_for('admin.ph_pulihkan') }}"
+            onsubmit="return confirm('Kembalikan data pH lapangan ke salinan {{ cadangan_ph.waktu }} ({{ cadangan_ph.baris }} baris)? Data saat ini akan disimpan sebagai salinan, sehingga dapat dikembalikan lagi.');">
+        <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+        <button class="btn s sm" type="submit">Kembalikan Data Sebelumnya</button>
+      </form>
+    </div>
+    {% endif %}
+
+    {% if hasil and not hasil.ok %}
+    <div class="alert bad ph-galat" role="alert">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+      <div><b>Berkas belum disimpan karena ada data yang perlu diperbaiki:</b>
+        <ul>{% for g in hasil.galat %}<li>{{ g }}</li>{% endfor %}</ul>
+        {% if hasil.lebih %}<p>… dan {{ hasil.lebih }} baris lain.</p>{% endif %}
+        <p>Perbaiki baris tersebut, lalu unggah kembali.</p></div>
+    </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" id="f-ph">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+      <label class="adm-drop" id="drop">
+        <input type="file" name="berkas" id="berkas" accept=".csv,text/csv" multiple required>
+        <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M12 18v-6M9 15l3-3 3 3"/></svg>
+        <b id="drop-t">Klik untuk memilih berkas, atau seret ke sini</b>
+        <span class="muted small">Template pH yang sudah diisi, format .csv. Boleh beberapa berkas sekaligus (misalnya satu berkas per bulan).</span>
+      </label>
+      <button class="btn p wide" type="submit" id="b-simpan">Periksa dan Simpan</button>
+    </form>
+    <div class="note">
+      <b>Yang diperiksa sebelum data disimpan:</b>
+      <ul class="adm-cek">
+        <li>Kolom <code>periode</code>, <code>kabupaten_kota</code>, <code>provinsi</code>, dan <code>ph</code> tersedia</li>
+        <li>Periode berformat TTTT-BB dan nama wilayah sesuai daftar {{ jumlah_wilayah }} kabupaten/kota</li>
+        <li>Nilai pH berupa angka di antara {{ batas[0] | int }} dan {{ batas[1] | int }}</li>
+      </ul>
+      Jika ada satu baris yang salah, semua berkas yang dipilih tidak disimpan. Data untuk periode dan wilayah yang
+      sama akan menggantikan data sebelumnya.
+    </div>
+  </section>
+
+  <section class="card adm-card" id="panduan">
+    <h2 class="adm-h">Panduan pengisian</h2>
+    <p class="adm-p">pH tanah tidak dapat diukur oleh satelit, sehingga pH bulanan hanya dapat ditampilkan dari hasil
+      uji tanah lapangan yang diambil secara berkala, misalnya oleh balai, penyuluh, atau alat uji tanah di lapangan.</p>
+
+    <h3 class="adm-h3">Langkah</h3>
+    <ol class="how adm-how">
+      <li><b>Pilih bulan, lalu unduh template</b>
+        <span>Template berisi seluruh {{ jumlah_wilayah }} kabupaten/kota, diurutkan dari Sabang sampai Merauke (urutan
+          provinsi menurut kode BPS), dengan kolom <code>periode</code> sudah terisi bulan yang dipilih.</span>
+        <form class="adm-templat" method="get" action="{{ url_for('admin.ph_templat') }}">
+          <label class="adm-bulan"><span class="muted small">Bulan pengambilan sampel</span>
+            <input type="month" name="periode" value="{{ bulan_templat }}" required></label>
+          <button class="btn p sm" type="submit">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>Unduh Template CSV</span></button>
+        </form></li>
+      <li><b>Isi nilai pH</b><span>Buka dengan Excel, isi kolom <code>ph</code> untuk wilayah yang memiliki hasil uji.
+        Baris yang kolom pH-nya dibiarkan kosong otomatis dilewati, jadi tidak perlu mengisi semua wilayah. Bulan
+        juga tidak harus berurutan. Untuk beberapa bulan, unduh template per bulan lalu unggah sekaligus.</span></li>
+      <li><b>Simpan sebagai CSV</b><span>Di Excel pilih <b>File → Save As → CSV (Comma delimited)</b> atau
+        <b>CSV UTF-8</b>. Pemisah titik koma (;) dan koma desimal (6,5) juga diterima.</span></li>
+      <li><b>Unggah di kotak sebelah kiri</b><span>Beberapa berkas dapat dipilih sekaligus. Setelah tersimpan, grafik
+        pH bulanan langsung tampil pada halaman hasil wilayah yang bersangkutan. Data yang salah dapat diperbaiki dengan
+        mengunggah ulang nilai yang benar, atau dihapus per bulan pada tabel Data tersimpan.</span></li>
+    </ol>
+
+  </section>
+</div>
+
+{% if per_periode %}
+<section class="card adm-card adm-lebar" id="tersimpan">
+  <div class="card-h wrap">
+    <div>
+      <h2>Data tersimpan</h2>
+      <p class="muted small-2">Data per bulan. Menghapus satu bulan menghapus pH bulan itu untuk semua wilayah;
+        data sebelum dihapus dapat dikembalikan dengan tombol <b>Kembalikan Data Sebelumnya</b>.</p>
+    </div>
+    <a class="btn s sm" href="{{ url_for('admin.ph_data') }}">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Unduh Semua Data</a>
+  </div>
+  <div class="adm-tabel-wrap"><table class="src adm-tabel">
+    <tr><th>Bulan</th><th>Jumlah wilayah</th><th>Sumber</th><th></th></tr>
+    {% for p in per_periode %}
+    <tr><td>{{ p.label }}</td><td>{{ p.wilayah }}</td><td class="adm-sumber" title="{{ p.sumber_semua }}">{{ p.sumber_ringkas }}{% if p.sumber_lebih %} <span class="muted">+{{ p.sumber_lebih }} lainnya</span>{% endif %}</td>
+      <td class="kanan"><form method="post" action="{{ url_for('admin.ph_hapus') }}"
+            onsubmit="return confirm('Hapus data pH lapangan {{ p.label }} untuk {{ p.wilayah }} wilayah? Tindakan ini tidak dapat dibatalkan dari halaman ini.');">
+        <input type="hidden" name="csrf" value="{{ csrf_token() }}"><input type="hidden" name="periode" value="{{ p.periode }}">
+        <button class="btn g sm hapus" type="submit">Hapus</button></form></td></tr>
+    {% endfor %}
+  </table></div>
+  {% if per_periode | length > 1 %}
+  <form method="post" action="{{ url_for('admin.ph_hapus') }}" class="adm-hapus-semua"
+        onsubmit="return confirm('Hapus SELURUH data pH lapangan ({{ per_periode | length }} bulan)? Grafik pH bulanan di halaman hasil akan hilang.');">
+    <input type="hidden" name="csrf" value="{{ csrf_token() }}"><input type="hidden" name="periode" value="semua">
+    <button class="btn g sm hapus" type="submit">Hapus Semua Data</button>
+  </form>
+  {% endif %}
+</section>
+{% endif %}
+
+<section class="card adm-card adm-lebar">
+  <h2 class="adm-h">Isi kolom template</h2>
+  <div class="adm-dua">
+    <div class="adm-tabel-wrap">
+    <table class="src">
+      <tr><th>Kolom</th><th>Isi</th><th>Contoh</th></tr>
+      <tr><td><code>periode</code></td><td>Bulan pengambilan sampel (TTTT-BB), wajib</td><td>2026-10</td></tr>
+      <tr><td><code>kabupaten_kota</code></td><td>Nama sesuai template, wajib (jangan diubah)</td><td>Kab. Bogor</td></tr>
+      <tr><td><code>provinsi</code></td><td>Nama sesuai template, wajib (jangan diubah)</td><td>Jawa Barat</td></tr>
+      <tr><td><code>ph</code></td><td>Rata-rata pH H<sub>2</sub>O hasil uji pada bulan tersebut</td><td>5,8</td></tr>
+      <tr><td><code>jumlah_sampel</code></td><td>Banyaknya titik sampel (opsional)</td><td>12</td></tr>
+      <tr><td><code>sumber</code></td><td>Instansi atau kegiatan uji tanah (opsional)</td><td>BPMP DKI Jakarta</td></tr>
+    </table>
+    </div>
+    <div class="adm-dua-catatan">
+      <p class="note"><b>Gunakan pH H<sub>2</sub>O</b> (bukan pH KCl) agar dapat dibandingkan dengan kelas pH
+        Balai Perakitan dan Pengujian Tanah dan Pupuk dan rentang kesesuaian tanaman yang dipakai aplikasi.</p>
+      <p class="note">Kolom <code>kabupaten_kota</code> dan <code>provinsi</code> harus sama persis dengan template.
+        Jika diubah, baris tersebut dianggap salah dan berkas tidak disimpan.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  const inp = document.getElementById('berkas'), drop = document.getElementById('drop'),
+        teks = document.getElementById('drop-t'), form = document.getElementById('f-ph'),
+        tombol = document.getElementById('b-simpan');
+  const tampil = () => { const n = inp.files.length; if (n) { teks.textContent = n > 1 ? n + ' berkas dipilih: ' + [...inp.files].map(f => f.name).join(', ') : inp.files[0].name; drop.classList.add('isi'); } };
+  inp.addEventListener('change', tampil);
+  ['dragenter', 'dragover'].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.add('seret'); }));
+  ['dragleave', 'drop'].forEach(e => drop.addEventListener(e, () => drop.classList.remove('seret')));
+  drop.addEventListener('drop', ev => { ev.preventDefault(); if (ev.dataTransfer.files.length) { inp.files = ev.dataTransfer.files; tampil(); } });
+  form.addEventListener('submit', () => { tombol.disabled = true; tombol.textContent = 'Memeriksa data…'; });
+})();
+</script>
+{% endblock %}

@@ -210,6 +210,7 @@ def main():
     kol = ["ADM2_NAME", "ADM1_NAME", "kelompok_wilayah", "periode", TARGET, "pred_final"]
     u[kol].to_csv(REPORTS / "05_prediksi_uji_final.csv", index=False)
 
+    ev_m = ev.set_index(["pendekatan", "skenario", "dievaluasi_pada"])
     w_akhir = {c: (bobot[c] if kode == "gab" else (1.0 if kode == "rf" else 0.0)) for c in bobot}
     konf = {
         "pendekatan": terbaik,
@@ -220,6 +221,19 @@ def main():
         "metrik_uji_indonesia": {k: round(float(akhir.loc["Indonesia", k]), 4) for k in ["R2", "MAE", "RMSE"]},
         "metrik_uji_wilayah_khusus": {n: {k: round(float(akhir.loc[n, k]), 4) for k in ["R2", "MAE", "RMSE", "n"]}
                                       for n in akhir.index if n.startswith("Wilayah")},
+        # akurasi data uji ke-16 model (ditampilkan di halaman Informasi aplikasi):
+        # model nasional diuji pada seluruh Indonesia, model regional pada kelompok wilayahnya
+        "metrik_semua_model": {
+            j: {c: {k: round(float(ev_m.loc[(lab, "nasional" if c == "nasional" else "regional",
+                                             "Indonesia" if c == "nasional" else c), k]), 4)
+                    for k in ["R2", "MAE", "RMSE"]}
+                for c in ["nasional"] + KELOMPOK}
+            for j, lab in [("rf", LABEL["rf"]), ("xgb", LABEL["xgb"])]},
+        # perbandingan model nasional vs regional per kelompok (aturan 10%), ditampilkan di halaman Informasi
+        "aturan_10_persen": [{"kelompok": kel, "rmse_nasional": round(float(r["rmse_nasional"]), 4),
+                              "rmse_regional": round(float(r["rmse_regional"]), 4),
+                              "selisih_persen": round(float(r["selisih_%"]), 1), "dipakai": r["model_dipakai"]}
+                             for kel, r in banding.iterrows()],
         "dibuat": datetime.now().isoformat(timespec="seconds"),
     }
     (MODELS / "model_terpilih.json").write_text(json.dumps(konf, indent=1, ensure_ascii=False), encoding="utf-8")

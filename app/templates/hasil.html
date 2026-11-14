@@ -23,6 +23,18 @@
   </div>
 </div>
 
+{% if mode == 'otomatis' and (penanda[0] >= 20 or penanda[1] >= 20) %}
+<div class="res-alert" role="note">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>
+  <div>
+    {% if penanda[0] >= 20 %}<p><b>Wilayah gambut ({{ penanda[0] }}% luas wilayah).</b> Tanah gambut menyimpan air jauh lebih banyak
+      daripada tanah biasa, dan hal ini tidak tercakup dalam data model, sehingga estimasi di wilayah ini biasanya kurang tepat.
+      Bandingkan dengan nilai aktual SMAP pada kartu estimasi.</p>{% endif %}
+    {% if penanda[1] >= 20 %}<p><b>Wilayah berbadan air luas ({{ penanda[1] }}% luas wilayah).</b> Nilai satelit di sekitar danau atau
+      waduk dapat terpengaruh permukaan air, sehingga hasil perlu ditafsirkan dengan hati-hati.</p>{% endif %}
+  </div>
+</div>
+{% endif %}
 <div class="res-grid">
   <section class="card res-card">
     <div class="muted">Estimasi kelembapan tanah</div>
@@ -33,24 +45,19 @@
       {% if mode == 'otomatis' %}Kelembapan tanah wilayah ini tergolong <b>{{ kategori }}</b> dibandingkan sebaran kabupaten/kota lain pada data latih.
       {% else %}Dengan nilai variabel ini, kelembapan tanah tergolong <b>{{ kategori }}</b> dibandingkan sebaran kabupaten/kota pada data latih.{% endif %}
     </div>
-    <ul class="meta">
-      <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Dihitung dengan {{ sumber }}.</li>
-      {% if mode == 'otomatis' and smap is not none %}
-      <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>Nilai acuan SMAP L4 bulan ini: {{ smap | angka(2) }} m³/m³.</li>
-      {% endif %}
-      {% if mode == 'otomatis' and penanda[1] >= 20 %}
-      <li class="warn-t"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>Wilayah berbadan air luas: tafsirkan dengan hati-hati.</li>
-      {% endif %}
-    </ul>
-    {% if mode == 'otomatis' and penanda[0] >= 20 %}
-    <div class="note warn">
-      <b>Wilayah gambut ({{ penanda[0] }}% luas wilayah).</b>
-      {% if gambut %}Pada data uji, estimasi di wilayah gambut meleset rata-rata ±{{ gambut.mae | angka(3) }} m³/m³
-      (R² {{ gambut.r2 | angka(2) }}). Perkiraan rentang:
-      <b>{{ gambut.bawah | angka(2) }}–{{ gambut.atas | angka(2) }} m³/m³</b>.
-      {% else %}Estimasi di wilayah gambut kurang akurat dibandingkan wilayah lain.{% endif %}
+    {% if mode == 'otomatis' and bd and bd.bulan.aktual is not none %}
+    {% set b = bd.bulan %}
+    <div class="vs" aria-label="Perbandingan nilai aktual dan estimasi bulan ini">
+      <div><span><i class="sw-akt"></i>Aktual SMAP</span><b>{{ b.aktual | angka(3) }}</b></div>
+      <div><span><i class="sw-est"></i>Estimasi model</span><b>{{ v | angka(3) }}</b></div>
+      <div class="vs-sel"><span>Meleset</span><b>{{ '+' if b.selisih >= 0 else '−' }}{{ b.selisih | abs | angka(3) }}</b>
+        {% if b.persen is not none %}<small>{{ (b.persen | abs) | angka(1) }}% dari nilai aktual</small>{% endif %}</div>
     </div>
     {% endif %}
+    <ul class="meta">
+      <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Dihitung dengan {{ sumber }}.</li>
+
+    </ul>
     {% if mode == 'otomatis' %}
     <a class="btn s wide" href="{{ url_for('simulasi', dari=wid, periode=periode) }}">Coba Skenario di Mode Simulasi</a>
     {% else %}
@@ -139,6 +146,134 @@
     <div><span class="muted">{{ info[f][0] }}</span><b>{{ x[f] | angka(2 if f in ('ndvi', 'slope') else 1) }} <small>{{ '' if info[f][1] == '–' else info[f][1] }}</small></b></div>
     {% endfor %}
   </div>
+</section>
+{% endif %}
+
+{% if mode == 'otomatis' and bd %}
+<section class="card trend banding" aria-labelledby="judul-banding">
+  <div class="card-h wrap">
+    <div><h2 id="judul-banding">Nilai aktual dan estimasi model</h2>
+      <p class="muted small-2">{{ judul }}, {{ tren.awal }} – {{ tren.akhir }} (m³/m³) · nilai aktual dari SMAP L4, estimasi dari model aplikasi</p></div>
+    <div class="bd-leg"><span><i class="sw-akt"></i>Aktual (SMAP L4)</span><span><i class="sw-est"></i>Estimasi model</span>
+      {% if bd.x_batas %}<span><i class="sw-latih"></i>Periode data latih</span>{% endif %}</div>
+  </div>
+  <div class="bd-stat">
+    <div><span>Bulan ini ({{ bd.pilih.label }})</span>
+      <b>{% if bd.bulan.selisih is not none %}{{ '+' if bd.bulan.selisih >= 0 else '−' }}{{ bd.bulan.selisih | abs | angka(3) }}{% else %}–{% endif %}</b>
+      <small>{% if bd.bulan.selisih is none %}data tidak lengkap{% elif bd.bulan.selisih >= 0 %}estimasi lebih tinggi dari aktual{% else %}estimasi lebih rendah dari aktual{% endif %}</small></div>
+    {% if bd.mae_luar is not none %}
+    <div><span>Rata-rata meleset</span><b>±{{ bd.mae_luar | angka(3) }}</b>
+      <small>{{ bd.n_luar }} bulan di luar data latih</small></div>
+    {% endif %}
+    {% if bd.terbesar %}
+    <div><span>Meleset terbesar</span><b>±{{ bd.terbesar.nilai | angka(3) }}</b><small>{{ bd.terbesar.label }}</small></div>
+    {% endif %}
+  </div>
+  <div class="trend-gulir"><svg class="trend-svg bd-svg" viewBox="0 0 {{ bd.W }} {{ bd.H }}" role="img" aria-label="Grafik nilai aktual SMAP L4 dan estimasi model per bulan, beserta selisihnya">
+    {% if bd.x_batas %}
+    <rect x="{{ bd.x_awal }}" y="{{ bd.T - 6 }}" width="{{ bd.x_batas - bd.x_awal }}" height="{{ bd.H2 - bd.T + 6 }}" class="latih"/>
+    <text x="{{ bd.x_batas - 8 }}" y="{{ bd.T + 6 }}" text-anchor="end" class="zona">Data latih</text>
+    <text x="{{ bd.x_batas + 8 }}" y="{{ bd.T + 6 }}" class="zona">Tidak dipakai melatih model</text>
+    {% endif %}
+    {% for g in bd.gy %}<line x1="{{ bd.L }}" x2="{{ bd.W - bd.R }}" y1="{{ g.y }}" y2="{{ g.y }}" class="gl"/><text x="{{ bd.L - 8 }}" y="{{ g.y + 4 }}" text-anchor="end">{{ g.teks }}</text>{% endfor %}
+    {% if bd.pita %}<polygon points="{{ bd.pita }}" class="pita"/>{% endif %}
+    <polyline points="{{ bd.aktual }}" class="ln-akt"/>
+    <polyline points="{{ bd.estimasi }}" class="ln-est"/>
+    <line x1="{{ bd.pilih.x }}" x2="{{ bd.pilih.x }}" y1="{{ bd.T }}" y2="{{ bd.H2 }}" class="cur"/>
+    {% if bd.pilih.ya is not none %}<circle cx="{{ bd.pilih.x }}" cy="{{ bd.pilih.ya }}" r="5" class="pt pt-akt"/>{% endif %}
+    {% if bd.pilih.ye is not none %}<circle cx="{{ bd.pilih.x }}" cy="{{ bd.pilih.ye }}" r="5" class="pt pt-est"/>{% endif %}
+    <text x="{{ bd.L - 8 }}" y="{{ bd.T2 - 8 }}" text-anchor="start" class="sub-t">Selisih (estimasi − aktual)</text>
+    <line x1="{{ bd.L }}" x2="{{ bd.W - bd.R }}" y1="{{ bd.tengah }}" y2="{{ bd.tengah }}" class="nol"/>
+    <text x="{{ bd.L - 8 }}" y="{{ bd.T2 + 4 }}" text-anchor="end">+{{ bd.smax }}</text>
+    <text x="{{ bd.L - 8 }}" y="{{ bd.tengah + 4 }}" text-anchor="end">0</text>
+    <text x="{{ bd.L - 8 }}" y="{{ bd.H2 + 4 }}" text-anchor="end">−{{ bd.smax }}</text>
+    {% for b in bd.batang %}<rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" rx="1.5" class="bsel{{ ' naik' if b.naik else ' turun' }}{{ ' dl' if b.latih }}{{ ' on' if b.pilih }}"/>{% endfor %}
+    {{ R.sumbu_bulan(bd) }}
+    {{ R.titik_tooltip(bd) }}
+  </svg></div>
+  <div class="tip-grafik" hidden></div>
+  <p class="rk-cat muted">{% if bd.semua_latih %}Seluruh bulan pada grafik ikut dipakai untuk melatih model, sehingga selisihnya cenderung kecil.
+    {% else %}Bulan sampai {{ bd.akhir_latih }} dipakai untuk melatih model, sehingga selisihnya cenderung kecil{% if bd.mae_dalam is not none %} (rata-rata ±{{ bd.mae_dalam | angka(3) }}){% endif %}.
+    Selisih pada bulan sesudahnya menunjukkan kemampuan model pada data yang belum pernah dilihat.{% endif %}
+    Batang di atas garis nol berarti estimasi lebih tinggi dari nilai aktual, di bawah garis nol berarti lebih rendah.</p>
+</section>
+{% endif %}
+
+{% if mode == 'otomatis' and ph %}
+<section class="card ph-card" aria-labelledby="judul-ph">
+  <div class="card-h wrap">
+    <div><h2 id="judul-ph">pH tanah dan kesesuaian tanaman</h2>
+      <p class="muted small-2">{{ judul }} · lapisan olah 0–30 cm · berlaku untuk setiap bulan</p></div>
+    <span class="chip">Informasi tambahan</span>
+  </div>
+  <div class="ph-grid">
+    <div class="ph-kiri">
+      <div class="ph-nilai"><b>{{ ph.ph | angka(1) }}</b>
+        <span class="ph-kelas" style="--c: {{ ph.warna }}">{{ ph.kelas | capitalize }}</span></div>
+      <div class="ph-skala" aria-hidden="true"><i style="left: {{ (ph.posisi * 100) | round(1) }}%"></i></div>
+      <div class="ph-skala-l" aria-hidden="true"><span>4 · masam</span><span>6,5 · netral</span><span>9 · alkalis</span></div>
+      {% if ph.p10 is not none and ph.p90 is not none %}
+      <p class="muted small-2 ph-sebar">Sebagian besar lahan di wilayah ini (80%) memiliki pH {{ ph.p10 | angka(1) }}–{{ ph.p90 | angka(1) }}.</p>
+      {% endif %}
+      <div class="ph-asal">
+        <h3>Asal nilai pH ini</h3>
+        <p>Perkiraan pH rata-rata lapisan olah (0–30 cm) di seluruh wilayah, dari peta tanah OpenLandMap (250 m) yang
+          dimodelkan berdasarkan sampel tanah tahun 1950–2018. Nilai ini menggambarkan kondisi tanah secara umum, bukan
+          hasil uji lahan tertentu, sehingga sama untuk setiap bulan.</p>
+      </div>
+      <div class="ph-arahan">
+        <h3>Arahan penyesuaian pH</h3>
+        <p>{{ ph.arahan }} Jenis dan jumlah bahan perlu ditentukan berdasarkan uji tanah laboratorium.</p>
+      </div>
+      <div class="ph-bulan">
+        <h3>Kondisi bulan ini ({{ bd.pilih.label if bd else '' }})</h3>
+        <p>{% if kategori == 'rendah' %}Kelembapan tanah tergolong <b>rendah</b>. Perlu perencanaan irigasi atau pengalihan air sebelum penanaman.
+          {% elif kategori == 'tinggi' %}Kelembapan tanah tergolong <b>tinggi</b>. Ketersediaan air umumnya cukup; perhatikan drainase pada lahan yang mudah tergenang.
+          {% else %}Kelembapan tanah tergolong <b>sedang</b>. Ketersediaan air umumnya cukup untuk penanaman.{% endif %}</p>
+      </div>
+    </div>
+    <div class="ph-kanan">
+      {% for judul_k, isi_k, kelas_k in [('Sangat sesuai (S1)', ph.s1, 's1'), ('Cukup sesuai (S2)', ph.s2, 's2')] %}
+      <h3>{{ judul_k }}</h3>
+      {% if isi_k %}
+      <dl class="ph-tan">
+        {% for g in isi_k %}<dt>{{ g.golongan }}</dt><dd>{% for t in g.tanaman %}<span class="tan {{ kelas_k }}">{{ t }}</span>{% endfor %}</dd>{% endfor %}
+      </dl>
+      {% else %}<p class="muted small-2">Tidak ada tanaman pada kelas ini.</p>{% endif %}
+      {% endfor %}
+      <p class="muted small-2 ph-batas">Kesesuaian tanaman di atas hanya didasarkan pada pH tanah. Faktor lain seperti ketinggian tempat,
+        iklim, dan penggunaan lahan belum diperhitungkan.</p>
+      {% if ph.atur %}
+      <h3>Perlu penyesuaian pH</h3>
+      <p class="muted small-2 ph-atur-k">Tanaman berikut membutuhkan pH yang berbeda (rentang sangat sesuai di dalam kurung).</p>
+      <div class="ph-atur">{% for t in ph.atur %}<span class="tan atur">{{ t.nama }} <small>{{ t.target }}{{ ' ↑' if t.arah == 'naik' else ' ↓' }}</small></span>{% endfor %}</div>
+      {% endif %}
+    </div>
+  </div>
+  {% if ph.gambut %}<p class="note warn ph-gambut">Wilayah ini bergambut. Tanah gambut umumnya sangat masam, dan peta pH 250 m dapat kurang mewakili kondisi lahan gambut.</p>{% endif %}
+  <div class="ph-bulanan">
+    <h3>pH bulanan dari uji tanah lapangan</h3>
+    {% if ph_lap %}
+    <p class="muted small-2">{{ ph_lap.n }} pengukuran: {{ ph_lap.rentang }}.
+      Terakhir: <b>pH {{ ph_lap.akhir.ph | angka(1) }} ({{ ph_lap.akhir.kelas }})</b> pada {{ ph_lap.akhir.label }}{% if ph_lap.akhir.sumber %}, sumber {{ ph_lap.akhir.sumber }}{% endif %}.</p>
+    <div class="trend-gulir"><svg class="trend-svg ph-svg" viewBox="0 0 {{ ph_lap.W }} {{ ph_lap.H }}" role="img" aria-label="Grafik pH tanah hasil uji lapangan per bulan">
+      <rect x="{{ ph_lap.L }}" y="{{ ph_lap.pita.y_atas }}" width="{{ ph_lap.W - ph_lap.L - ph_lap.R }}" height="{{ ph_lap.pita.y_bawah - ph_lap.pita.y_atas }}" class="netral"/>
+      <text x="{{ ph_lap.W - ph_lap.R - 4 }}" y="{{ ph_lap.pita.y_atas + 12 }}" text-anchor="end" class="zona">netral</text>
+      {% for g in ph_lap.gy %}<line x1="{{ ph_lap.L }}" x2="{{ ph_lap.W - ph_lap.R }}" y1="{{ g.y }}" y2="{{ g.y }}" class="gl"/><text x="{{ ph_lap.L - 8 }}" y="{{ g.y + 4 }}" text-anchor="end">{{ g.teks }}</text>{% endfor %}
+      {% for r in ph_lap.ruas %}<line x1="{{ r.x1 }}" y1="{{ r.y1 }}" x2="{{ r.x2 }}" y2="{{ r.y2 }}" class="ln-ph{{ ' putus' if r.putus }}"/>{% endfor %}
+      {% for t in ph_lap.titik %}<circle cx="{{ t.x }}" cy="{{ t.y }}" r="5" fill="{{ t.warna }}" class="pt-ph"><title>{{ t.teks }}</title></circle>{% endfor %}
+      {% for x in ph_lap.sumbu %}<text x="{{ x.x }}" y="{{ ph_lap.H - 8 }}" text-anchor="middle">{{ x.teks }}</text>{% endfor %}
+    </svg></div>
+    {% if ph_lap.ada_jeda %}<p class="muted small-2 ph-jeda">Garis putus-putus menandakan ada bulan tanpa data uji tanah di antara dua pengukuran.</p>{% endif %}
+    {% else %}
+    <p class="ph-kosong">pH tanah belum dapat ditampilkan per bulan karena pH tidak dapat diukur oleh satelit, berbeda dengan
+      kelembapan tanah. pH bulanan beserta grafiknya akan tampil di sini apabila tersedia data uji tanah lapangan yang
+      diambil secara berkala dan ditambahkan oleh pengelola aplikasi.</p>
+    {% endif %}
+  </div>
+  <p class="rk-cat muted">Sumber: pH tanah dari OpenLandMap Soil pH in H<sub>2</sub>O (Hengl, 2018; 250 m); kelas pH menurut
+    Eviati &amp; Sulaeman (2009), Balai Perakitan dan Pengujian Tanah dan Pupuk (dahulu Balai Penelitian Tanah); kesesuaian tanaman menurut Petunjuk Teknis Evaluasi Lahan untuk Komoditas Pertanian
+    (Ritung dkk., 2011). Tanda ↑ berarti pH perlu dinaikkan, ↓ perlu diturunkan.</p>
 </section>
 {% endif %}
 {% if not wf.asli or sumber_kepentingan != 'shap' %}
