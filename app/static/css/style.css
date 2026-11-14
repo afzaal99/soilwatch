@@ -1070,3 +1070,13 @@ button.btn.p { border: 0; }
 .adm-demo { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 18px; padding: 12px 14px; border-radius: 10px;
   background: #FFFBEB; border: 1px solid #FCD34D; color: #92400E; font-size: 14px; line-height: 1.55; }
 .adm-demo svg { flex: none; margin-top: 2px; }
+
+/* ---- tampilan terang tetap (HP dengan mode gelap) ---- */
+:root { color-scheme: only light; }
+
+/* ---- HP: menu utama dibagi rata kiri-kanan ---- */
+@media (max-width: 560px) {
+  .nav-inner { align-items: stretch; }
+  .links:not(.adm-links) { width: 100%; justify-content: space-between; gap: 6px; }
+  .links:not(.adm-links) a { flex: 1; text-align: center; }
+}

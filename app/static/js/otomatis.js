@@ -295,10 +295,31 @@
     zoom(e.deltaY < 0 ? 0.85 : 1 / 0.85, x, y);
   }, { passive: false });
   const geser = { aktif: false, pindah: false };
+  const jari = new Map();                                  // pointer aktif (layar sentuh: bisa dua jari)
+  let cubit = null;                                        // {jarak} saat dua jari menyentuh peta
+  const jarakJari = () => { const [a, b] = [...jari.values()]; return Math.hypot(a.x - b.x, a.y - b.y); };
+  const tengahJari = () => { const [a, b] = [...jari.values()]; return { clientX: (a.x + b.x) / 2, clientY: (a.y + b.y) / 2 }; };
   svg.addEventListener('pointerdown', e => {
+    jari.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (jari.size === 2) {                                 // mulai cubit: hentikan geser satu jari
+      cubit = { jarak: jarakJari() };
+      geser.aktif = false; geser.pindah = true;
+      return;
+    }
     geser.aktif = true; geser.pindah = false; geser.x = e.clientX; geser.y = e.clientY; geser.vb = vb.slice();
   });
   window.addEventListener('pointermove', e => {
+    if (jari.has(e.pointerId)) jari.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (cubit && jari.size === 2) {
+      const d = jarakJari();
+      if (d > 0 && cubit.jarak > 0) {
+        const [x, y] = keSvg(tengahJari());
+        zoom(cubit.jarak / d, x, y);                       // jari menjauh = perbesar, mendekat = perkecil
+        cubit.jarak = d;
+        tip.hidden = true;
+      }
+      return;
+    }
     if (!geser.aktif) return;
     const dx = e.clientX - geser.x, dy = e.clientY - geser.y;
     if (Math.abs(dx) + Math.abs(dy) > 4) geser.pindah = true;
@@ -310,5 +331,12 @@
     pasang();
     tip.hidden = true;
   });
-  window.addEventListener('pointerup', () => { geser.aktif = false; setTimeout(() => { geser.pindah = false; }, 0); });
+  const lepas = e => {
+    jari.delete(e.pointerId);
+    if (jari.size < 2) cubit = null;
+    geser.aktif = false;
+    setTimeout(() => { if (!jari.size) geser.pindah = false; }, 0);
+  };
+  window.addEventListener('pointerup', lepas);
+  window.addEventListener('pointercancel', lepas);
 })();
