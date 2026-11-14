@@ -1080,3 +1080,20 @@ button.btn.p { border: 0; }
   .links:not(.adm-links) { width: 100%; justify-content: space-between; gap: 6px; }
   .links:not(.adm-links) a { flex: 1; text-align: center; }
 }
+
+/* ---- Informasi: tidak boleh lebih lebar dari layar; semua kartu selebar layar ---- */
+.info > *, .info-cols > *, .info-stack > *, .akurasi-kolom > * { min-width: 0; }
+@media (max-width: 1100px) { .akurasi-kolom { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 960px) {
+  .info { grid-template-columns: minmax(0, 1fr); }
+  .info-cols { align-items: stretch; }
+  .info-cols > .info-card { width: 100%; }
+}
+/* tabel lebar tetap bisa digeser di dalam kartunya sendiri, bukan seluruh halaman */
+.mm-gulir { max-width: 100%; }
+@media (max-width: 560px) {
+  .mm { font-size: 12.5px; }
+  .mm th, .mm td { padding: 6px 5px; }
+}
+/* kartu Pengembang selebar kartu lain di semua ukuran layar */
+#pengembang { width: 100%; box-sizing: border-box; }
