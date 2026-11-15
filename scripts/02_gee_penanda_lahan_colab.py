@@ -18,7 +18,7 @@ Gambut: persentase gambut per kabupaten/kota sekarang dihitung oleh script 02b d
 (Peta Lahan Gambut Indonesia, Kementan 2019). ASET_GAMBUT di bawah cukup dibiarkan None.
 SETELAH script ini dijalankan ulang, jalankan lagi script 02b (CSV penanda tertimpa tanpa kolom gambut).
 
-Hasil diekspor ke Google Drive (folder "skripsi_gee"), semuanya ditaruh di soilwatch/data/geo/:
+Hasil diekspor ke Google Drive (folder "soilwatch_gee"), semuanya ditaruh di soilwatch/data/geo/:
   1. penanda_lahan_kabkota.csv         proporsi lahan per kabupaten/kota
   2. batas_kabkota_gaul2025.geojson    batas 514 kabupaten/kota untuk peta web
   3. badan_air_besar.geojson           bentuk badan air darat >= LUAS_MIN_AIR km2 (danau, waduk)
@@ -38,7 +38,7 @@ import ee
 
 PROJECT_ID = "analisis-soil-moisture-id"
 ASET_GAMBUT = None  # contoh: "projects/ISI-PROJECT-ID/assets/peta_gambut_kementan"
-FOLDER_DRIVE = "skripsi_gee"
+FOLDER_DRIVE = "soilwatch_gee"
 SKALA = 100            # meter; skala hitung proporsi (WorldCover 10 m dirata-ratakan ke 100 m)
 AMBANG_PENANDA = 0.20  # 20%, Subbab 2.2.1.10
 SKALA_VEKTOR = 250     # meter; resolusi pembentukan poligon untuk peta (cukup untuk tampilan nasional)

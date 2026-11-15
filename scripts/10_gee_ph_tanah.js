@@ -4,16 +4,16 @@
 // Sumber : OpenLandMap Soil pH in H2O (Hengl, 2018), resolusi 250 m, nilai = pH x 10.
 //          Band b0 (0 cm), b10 (10 cm), b30 (30 cm): lapisan olah tanah 0-30 cm.
 // Batas  : FAO GAUL 2025 level 2, sama dengan script 09 (514 kabupaten/kota).
-// Keluaran (Google Drive, folder skripsi_gee): ph_tanah_kabkota.csv dengan kolom
+// Keluaran (Google Drive, folder soilwatch_gee): ph_tanah_kabkota.csv dengan kolom
 //          ADM2_CODE, ADM2_NAME, ADM1_NAME, ph_0cm, ph_10cm, ph_30cm, ph_p10, ph_p90
 //   ph_0cm..ph_30cm : rata-rata pH di dalam wilayah pada kedalaman tersebut
 //   ph_p10, ph_p90  : persentil 10 dan 90 pH lapisan 0-30 cm (sebaran pH di dalam wilayah)
 // Data pH ini statis (satu nilai per wilayah), karena pH tanah berubah sangat lambat.
-// Cara pakai: tempel di Code Editor GEE -> Run -> tab Tasks -> RUN -> unduh CSV dari Drive 
+// Cara pakai: tempel di Code Editor GEE -> Run -> tab Tasks -> RUN -> unduh CSV dari Drive
 //             -> simpan sebagai app/data/ph_tanah.csv
 // =====================================================================================
 
-var FOLDER_DRIVE = 'skripsi_gee';
+var FOLDER_DRIVE = 'soilwatch_gee';
 
 var kabkota = ee.FeatureCollection('FAO/GAUL/2025/level2')
   .filter(ee.Filter.eq('GAUL0_NAME', 'Indonesia'))

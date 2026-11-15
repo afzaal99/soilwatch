@@ -18,11 +18,11 @@
 //   1. Isi BULAN_BARU, misalnya [[2026, 7], [2026, 8]].
 //   2. Klik Run. Baca hasil cek kelengkapan di tab Console.
 //   3. Jika semua "lengkap", buka tab Tasks lalu klik RUN pada tugas ekspor.
-//   4. Unduh CSV dari Google Drive (folder skripsi_gee), unggah di dashboard admin.
+//   4. Unduh CSV dari Google Drive (folder soilwatch_gee), unggah di dashboard admin.
 // =========================================================================
 
 var BULAN_BARU = [[2026, 7], [2026, 8], [2026, 9], [2026, 10]];
-var FOLDER_DRIVE = 'skripsi_gee';
+var FOLDER_DRIVE = 'soilwatch_gee';
 
 
 // 1. BATAS WILAYAH (FAO GAUL 2025 level 2: 514 kabupaten/kota)
