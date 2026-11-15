@@ -3,7 +3,7 @@ models/rf_*.joblib
 data/raw
 data/processed
 data/geo
-reports
+reports/*
 instance
 .venv
 venv
@@ -12,3 +12,5 @@ venv
 *.docx
 *.pptx
 PROMPT_CLAUDE_CODE.md
+# panduan pengguna tetap ikut, dibuka lewat /panduan
+!reports/ManualBook_SoilWatchID.pdf

@@ -1119,3 +1119,16 @@ button.btn.p { border: 0; }
 .pk-oto-h.kering span::before { background: #bf812d; }
 .pk-oto-h.basah span::before { background: #01665e; }
 .pk-oto-h small { font-weight: 500; color: var(--muted); font-size: 11.5px; padding-right: 14px; }
+
+/* ---- tautan Panduan Pengguna ---- */
+.footer-panduan { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px 10px; margin-bottom: 8px; font-weight: 600; }
+.footer-panduan a { color: var(--brand, #0F766E); text-decoration: none; }
+.footer-panduan a:hover { text-decoration: underline; }
+.panduan-aksi { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px 16px;
+  margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line, #E2E8F0); }
+.panduan-tombol { display: flex; flex-wrap: wrap; gap: 8px; }
+.adm-head-aksi { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+@media (max-width: 560px) {
+  .panduan-tombol { width: 100%; }
+  .panduan-tombol .btn { flex: 1 1 100%; justify-content: center; }
+}

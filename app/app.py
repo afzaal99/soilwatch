@@ -12,7 +12,7 @@ import secrets
 from datetime import timedelta
 from pathlib import Path
 
-from flask import Flask, Response, abort, jsonify, redirect, render_template, request, url_for
+from flask import Flask, Response, abort, jsonify, redirect, render_template, request, send_file, url_for
 from markupsafe import Markup
 
 import admin
@@ -87,6 +87,26 @@ def halaman_galat(e):
     if kode == 400 and desk and not desk.startswith("The browser"):
         pesan = desk                                   # pesan khusus, mis. formulir admin kedaluwarsa
     return render_template("segera.html", judul=judul, pesan=pesan), kode
+
+
+PANDUAN = BASE.parent / "reports" / "ManualBook_SoilWatchID.pdf"     # manual book (ikut di-push ke GitHub)
+
+
+@app.route("/panduan")
+def panduan():
+    """Buka panduan pengguna (PDF) di peramban."""
+    if not PANDUAN.exists():
+        abort(404)
+    return send_file(PANDUAN, mimetype="application/pdf", download_name="Panduan_SoilWatchID.pdf")
+
+
+@app.route("/panduan/unduh")
+def panduan_unduh():
+    """Unduh panduan pengguna (PDF)."""
+    if not PANDUAN.exists():
+        abort(404)
+    return send_file(PANDUAN, mimetype="application/pdf", as_attachment=True,
+                     download_name="Panduan_Pengguna_SoilWatchID.pdf")
 
 
 @app.route("/")

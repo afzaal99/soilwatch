@@ -31,6 +31,11 @@
     {% block content %}{% endblock %}
   </main>
   <footer class="footer">
+    <div class="footer-panduan">
+      <a href="{{ url_for('panduan') }}" target="_blank" rel="noopener">Lihat Panduan Pengguna</a>
+      <span aria-hidden="true">·</span>
+      <a href="{{ url_for('panduan_unduh') }}">Unduh Panduan (PDF)</a>
+    </div>
     Sumber data: SMAP Level 4 · CHIRPS · ERA5-Land · MODIS · SRTM · OpenLandMap · ESA WorldCover · Peta Lahan Gambut Kementan · FAO GAUL
   </footer>
 </body>
